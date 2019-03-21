@@ -1,26 +1,26 @@
 <template>
   <section>
-    <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
+    <el-form :model="loginForm" :rules="rules2" ref="loginForm" label-position="left" label-width="0px" class="demo-ruleForm login-container">
       <h3 class="title">系统登录</h3>
-      <el-form-item prop="account">
-        <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
+      <el-form-item prop="username">
+        <el-input type="text" v-model="loginForm.username"  placeholder="账号"></el-input>
       </el-form-item>
-      <el-form-item prop="checkPass">
-        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="密码"></el-input>
+      <el-form-item prop="password">
+        <el-input type="password" v-model="loginForm.password" placeholder="密码"></el-input>
       </el-form-item>
       <el-form-item>
         <a class="register" @click="showRegisterForm">注册>></a>
       </el-form-item>
       <el-form-item style="width:100%;">
-        <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
+        <el-button type="primary" style="width:100%;" @click.native.prevent="loginSubmit" :loading="logining">登录</el-button>
         <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
       </el-form-item>
     </el-form>
   
     <!--注册界面对话框-->
-    <el-dialog title="用户注册" v-model="registerFormVisible" :close-on-click-modal="false" width="30%">
-      <el-form label-width="70px">
-        <el-col :span="9">
+    <el-dialog title="用户注册" :visible.sync="registerFormVisible" :close-on-click-modal="false" width="35%">
+      <el-form label-width="70px" >
+        <el-col :span="10">
           <el-row>
             <el-form-item label="用户名" prop="username">
               <el-input></el-input>
@@ -42,7 +42,7 @@
             </el-form-item>
           </el-row>
         </el-col>
-        <el-col :span="8" :offset="7">
+        <el-col :span="8" :offset="5">
           <el-row>
             <el-form-item prop="nickName">
               <el-upload class="avatar-uploader" action="https://jsonplaceholder.typicode.com/posts/" 
@@ -63,7 +63,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="registerFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="addSubmit" :loading="registing">提交</el-button>
+        <el-button type="primary" @click.native="registerSubmit" :loading="registing">提交</el-button>
       </div>
     </el-dialog>
   </section>
@@ -71,27 +71,25 @@
 
 <script>
   import {
-    requestLogin
+    get
   } from '../api/api';
+  import http from '@/api/http.js'
   //import NProgress from 'nprogress'
   export default {
     data() {
       return {
         logining: false,
         registing: false,
-        ruleForm2: {
-          account: 'admin',
-          checkPass: '123456'
-        },
+        loginForm: {username: '',password: ''},
         rules2: {
-          account: [{
+          username: [{
               required: true,
               message: '请输入账号',
               trigger: 'blur'
             },
             //{ validator: validaePass }
           ],
-          checkPass: [{
+          password: [{
               required: true,
               message: '请输入密码',
               trigger: 'blur'
@@ -106,39 +104,36 @@
     },
     methods: {
       handleReset2() {
-        this.$refs.ruleForm2.resetFields();
+        this.$refs.loginForm.resetFields();
       },
-      handleSubmit2(ev) {
+
+      //用户登录
+      loginSubmit() {
         var _this = this;
-        this.$refs.ruleForm2.validate((valid) => {
+        this.$refs.loginForm.validate((valid) => {
           if (valid) {
             //_this.$router.replace('/table');
             this.logining = true;
             //NProgress.start();
-            var loginParams = {
-              username: this.ruleForm2.account,
-              password: this.ruleForm2.checkPass
+            var loginParam = {
+              username: this.loginForm.username,
+              password: this.loginForm.password
             };
-            requestLogin(loginParams).then(data => {
-              this.logining = false;
-              //NProgress.done();
-              let {
-                msg,
-                code,
-                user
-              } = data;
-              if (code !== 200) {
-                this.$message({
-                  message: msg,
-                  type: 'error'
-                });
-              } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({
-                  path: '/table'
-                });
-              }
-            });
+            http.post('/v1/login',loginParam).then(
+              res => {
+                console.log(res.status)
+                this.logining = false;
+                if(res.status == 'OK'){
+                   sessionStorage.setItem('user', JSON.stringify(res.result));
+                   this.$router.push({
+                     path: '/table'
+                   });
+                }
+              }).catch(error => {
+                console.log(error)
+                var content = '服務器異常，連接碼： ' + error.response.status
+              this.$alert(content, "警告", {})
+            })
           } else {
             console.log('error submit!!');
             return false;
@@ -146,12 +141,13 @@
         });
       },
       showRegisterForm() { //显示注册模态框
+        console.log('我被点击了')
         this.registerFormVisible = true;
       },
       handleAvatarSuccess(res, file) {
         this.imageUrl = URL.createObjectURL(file.raw);
       },
-      beforeAvatarUpload(file) {
+      beforeAvatarUpload(file) {  //判断照片类型
         const isJPG = file.type === 'image/jpeg';
         const isLt2M = file.size / 1024 / 1024 < 2;
   
@@ -162,6 +158,19 @@
           this.$message.error('上传头像图片大小不能超过 2MB!');
         }
         return isJPG && isLt2M;
+      },
+      //提交注册
+      registerSubmit(){
+        console.log('触发方法');
+        let url = '';
+        http.get('/v1/users/1/0',{}).then(
+          res => {
+            console.log(res)
+          }).catch(error => {
+            console.log(error)
+          var content = '服務器異常，連接碼： ' + error.response.status
+          this.$alert(content, "警告", {})
+        })
       }
     }
   }
