@@ -33,7 +33,7 @@
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+					<!--<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -75,32 +75,64 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="addForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="addForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
-			</div>
-		</el-dialog>
+    <el-dialog
+      title="用户注册"
+      :visible.sync="addFormVisible"
+      :close-on-click-modal="false"
+      width="35%"
+    >
+      <el-form label-width="70px" :rules="registerRule" ref="addForm" :model="addForm">
+        <el-col :span="12">
+          <el-row>
+            <el-form-item label="用户名" prop="username">
+              <el-input type="text" v-model="addForm.username" placeholder="账号"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-row>
+            <el-form-item label="密码" prop="password" class="pass">
+              <el-input type="text" v-model="addForm.password" placeholder="密码"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-row>
+            <el-form-item label="密码确认" prop="passwordConfirm">
+              <el-input type="text" v-model="addForm.passwordConfirm" placeholder="密码确认"></el-input>
+            </el-form-item>
+          </el-row>
+          <el-row>
+            <el-form-item label="昵称" prop="nickName">
+              <el-input type="text" v-model="addForm.nickName" placeholder="昵称"></el-input>
+            </el-form-item>
+          </el-row>
+        </el-col>
+        <el-col :span="12">
+          <el-row>
+            <el-form-item prop="avatarUrl">
+              <el-upload
+                class="avatar-uploader"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :auto-upload="true"
+              >
+                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+              </el-upload>
+            </el-form-item>
+          </el-row>
+          <el-row>
+            <el-col :offset="4">
+              <el-form-item>
+                <el-button type="primary">上传头像</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="addFormVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="registerSubmit" :loading="registing">提交</el-button>
+      </div>
+    </el-dialog>
 	</section>
 </template>
 
@@ -146,21 +178,16 @@
 					]
 				},
 				//新增界面数据
-				addForm: {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
-				}
+			    addForm: {
+        			username: "",
+        			password: "",
+        			passwordConfirm: "",
+        			nickName: ""
+      			},
 
 			}
 		},
 		methods: {
-			//性别显示转换
-			formatSex: function (row, column) {
-				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-			},
 			handleCurrentChange(val) {
 				this.page = val;
 				this.getUsers();
@@ -208,6 +235,7 @@
 			},
 			//显示新增界面
 			handleAdd: function () {
+				console.log("我被处罚")
 				this.addFormVisible = true;
 				this.addForm = {
 					name: '',
@@ -298,6 +326,6 @@
 
 </script>
 
-<style scoped>
+<style slot-scope>
 
 </style>
