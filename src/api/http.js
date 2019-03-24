@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {Alert} from 'element-ui'
+import qs from 'qs'
 
 
 // 请求拦截器
@@ -69,7 +70,11 @@ export function put(url,params = {}){
 
 export function del(url,params = {}){
   return new Promise((resolve,reject) => {
-    axios.delete(url,params)
+    axios.delete(url,{
+      params: params,
+      paramsSerializer: params => {
+        return qs.stringify(params, { indices: false })
+      }})
          .then(response => {
            resolve(response.data);
          },err => {

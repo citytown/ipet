@@ -64,13 +64,13 @@
             <el-form-item prop="avatarUrl">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
+                action="/v1/upload/user/"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
                 :auto-upload="true"
               >
-                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                <img v-if="this.registerForm.avatarUrl" :src="this.registerForm.avatarUrl" class="avatar">
               </el-upload>
             </el-form-item>
           </el-row>
@@ -92,7 +92,6 @@
 </template>
 
 <script>
-import { get } from "../api/api";
 import http from "@/api/http.js";
 //import NProgress from 'nprogress'
 export default {
@@ -150,10 +149,12 @@ export default {
         ]
       },
       registerForm: {
+        id:"",
         username: "",
         password: "",
         passwordConfirm: "",
-        nickName: ""
+        nickName: "",
+        avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
       },
       registerRule: {
         username: [
@@ -185,8 +186,6 @@ export default {
       },
       checked: true,
       registerFormVisible: false, //注册界面可见判断
-      imageUrl:
-        "https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
     };
   },
   methods: {
@@ -235,7 +234,13 @@ export default {
     },
     showRegisterForm() {
       //显示注册模态框
-      console.log("我被点击了");
+      http.get('/v1/randomId').then(res=>{
+        console.log(res);
+        if(res.status == 'OK')
+        this.registerForm.id = res.result;
+      }).catch(error=>{
+        console.error(error);
+      })
       this.registerFormVisible = true;
     },
     handleAvatarSuccess(res, file) {
@@ -259,7 +264,7 @@ export default {
         if (valid) {
           this.registering = true;
           http
-            .post("/v1/register", registerForm)
+            .post("/v1/user", this.registerForm)
             .then(res => {
               console.log(res.status);
               this.logining = false;
@@ -268,14 +273,16 @@ export default {
                   message: "注册成功！",
                   type: "success"
                 });
+                this.registerForm={id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"};
               }
               this.registering = false;
+              this.registerFormVisible = false;
             })
             .catch(error => {
               console.log(error);
               var content = "服務器異常，連接碼： " + error.response.status;
               this.$alert(content, "警告", {});
-            });
+            }); 
         } else {
           console.log("error submit!!");
           return false;

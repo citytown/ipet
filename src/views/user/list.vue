@@ -2,12 +2,12 @@
 	<section>
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" :model="filters">
+			<el-form :inline="true" >
 				<el-form-item>
-					<el-input v-model="filters.name" placeholder="姓名"></el-input>
+					<el-input v-model="queryUsername" placeholder="账号"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getUsers">查询</el-button>
+					<el-button type="primary" v-on:click="queryUsers">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
@@ -21,20 +21,18 @@
 			</el-table-column>
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="name" label="姓名" width="120" sortable>
+			<el-table-column prop="id" label="id" width="370" sortable>
 			</el-table-column>
-			<el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
+			<el-table-column prop="username" label="账号" width="370" sortable>
 			</el-table-column>
-			<el-table-column prop="age" label="年龄" width="100" sortable>
+			<el-table-column prop="password" label="密码" width="370" sortable>
 			</el-table-column>
-			<el-table-column prop="birth" label="生日" width="120" sortable>
-			</el-table-column>
-			<el-table-column prop="addr" label="地址" min-width="180" sortable>
+			<el-table-column prop="nickName" label="昵称" width="370" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
 					<!--<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button type="danger" size="small" @click="delUser(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -46,34 +44,6 @@
 			</el-pagination>
 		</el-col>
 
-		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-			</div>
-		</el-dialog>
-
 		<!--新增界面-->
     <el-dialog
       title="用户注册"
@@ -81,7 +51,7 @@
       :close-on-click-modal="false"
       width="35%"
     >
-      <el-form label-width="70px" :rules="registerRule" ref="addForm" :model="addForm">
+      <el-form label-width="70px" :rules="addFormRules" ref="addForm" :model="addForm">
         <el-col :span="12">
           <el-row>
             <el-form-item label="用户名" prop="username">
@@ -111,11 +81,9 @@
                 class="avatar-uploader"
                 action="https://jsonplaceholder.typicode.com/posts/"
                 :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
                 :auto-upload="true"
               >
-                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                <img v-if="addForm.avatarUrl" :src="addForm.avatarUrl" class="avatar">
               </el-upload>
             </el-form-item>
           </el-row>
@@ -130,7 +98,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="addFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="registerSubmit" :loading="registing">提交</el-button>
+        <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
       </div>
     </el-dialog>
 	</section>
@@ -138,53 +106,88 @@
 
 <script>
 	import util from '../../common/js/util'
-	//import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
+	import http from "@/api/http.js";
 
 	export default {
 		data() {
+			//校验确认密码
+			var validatePassConfirm = (rule, value, callback) => {
+				if (value === "") {
+					callback(new Error("请再次输入密码"));
+				} else if (value !== this.addForm.password) {
+					callback(new Error("两次输入密码不一致!"));
+				} else {
+					callback();
+				}
+			};
+			//校验用户名是否已经被注册
+			var validaeUsername = (rule, value, callback) => {
+				if (value === "") {
+					callback(new Error("请输入账号"));
+				} else {
+					http
+						.get("/v1/checkUser/" + value)
+						.then(res => {
+							console.log(res.status);
+							if (res.status == "OK") {
+								callback();
+							}else{
+								callback(new Error("该用户名已存在"));
+							}
+						})
+						.catch(error => {
+							console.log(error);
+						});
+				}
+			};
 			return {
-				filters: {
-					name: ''
-				},
 				users: [],
+				queryUsername:"",
 				total: 0,
 				page: 1,
 				listLoading: false,
 				sels: [],//列表选中列
 
-				editFormVisible: false,//编辑界面是否显示
-				editLoading: false,
-				editFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
-				},
-				//编辑界面数据
-				editForm: {
-					id: 0,
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
-				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
+					username: [
+						{
+							validator: validaeUsername,
+							trigger: "blur"
+						}
+					],
+					password: [
+						{
+							required: true,
+							message: "请输入密码",
+							trigger: "blur"
+						}
+					],
+					passwordConfirm: [
+						{
+							validator: validatePassConfirm,
+							trigger: "blur"
+						}
+					],
+					nickName: [
+						{
+							required: true,
+							message: "请输入昵称",
+							trigger: "blur"
+						}
 					]
 				},
 				//新增界面数据
-			    addForm: {
-        			username: "",
-        			password: "",
-        			passwordConfirm: "",
-        			nickName: ""
-      			},
-
+      	addForm: {
+        	id:"",
+        	username: "",
+        	password: "",
+       	 	passwordConfirm: "",
+        	nickName: "",
+        	avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
+      	},
 			}
 		},
 		methods: {
@@ -192,105 +195,115 @@
 				this.page = val;
 				this.getUsers();
 			},
+
 			//获取用户列表
 			getUsers() {
-				let para = {
-					page: this.page,
-					name: this.filters.name
-				};
 				this.listLoading = true;
-				//NProgress.start();
-				getUserListPage(para).then((res) => {
-					this.total = res.data.total;
-					this.users = res.data.users;
-					this.listLoading = false;
-					//NProgress.done();
+				http.get('/v1/users/'+this.page + '/20').then((res) => {
+					if(res.status == 'OK'){
+						this.total = res.result.total;
+						this.users = res.result.rows;
+						this.listLoading = false;
+					}else{
+						this.$message.error("查询用户失败!");
+					}
 				});
 			},
-			//删除
-			handleDel: function (index, row) {
+
+			//用户查询
+			queryUsers(){
+				this.listLoading = true;
+				if(this.queryUsername == ''){
+					this.getUsers();
+				}else{
+						http.get('/v1/likeUsers/'+this.queryUsername).then((res)=>{
+							console.log(res);
+						if(res.status == 'OK'){
+							this.total = res.result.length;
+							this.users = res.result;
+							this.listLoading = false;
+						}else{
+							this.$message.error("查询用户失败!");
+						}
+					})
+				}
+			},
+			//显示新增界面
+			handleAdd: function () {
+				this.addFormVisible = true;
+				//新增界面数据
+      	this.addForm={
+					id:"",
+        	username: "",
+        	password: "",
+       	 	passwordConfirm: "",
+        	nickName: "",
+        	avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
+				};
+				http.get('/v1/randomId').then(res=>{
+					console.log(res);
+        	if(res.status == 'OK')
+					this.addForm.id = res.result;
+					this.getUsers();
+      	}).catch(error=>{
+					console.error(error);
+     	 })
+			 this.$nextTick(()=>{
+   				this.$refs['addForm'].resetFields();
+			})
+		},
+    //新增
+    addSubmit: function() {
+      this.$refs.addForm.validate(valid => {
+        if (valid) {
+          this.addLoading = true;
+          http
+            .post("/v1/user", this.addForm)
+            .then(res => {
+              this.logining = false;
+              if (res.status == "OK") {
+                this.$message({
+                  message: "注册成功！",
+                  type: "success"
+                });
+              }
+							this.getUsers();
+              this.addLoading = false;
+							this.addFormVisible = false;
+            })
+            .catch(error => {
+              console.log(error);
+              var content = "服務器異常，連接碼： " + error.response.status;
+              this.$alert(content, "警告", {});
+            }); 
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+		},
+			//删除用户
+			delUser: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					//NProgress.start();
-					let para = { id: row.id };
-					removeUser(para).then((res) => {
+					let delids=[row.id];
+					console.log(delids);
+					http.del('/v1/user',{ids:delids}).then((res) => {
 						this.listLoading = false;
-						//NProgress.done();
-						this.$message({
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
+            if (res.status == "OK") {
+              this.$message({
+                message: "删除成功！",
+                 type: "success"
+              });
+							this.getUsers();
+            }else{
+							this.$message.error("删除用户失败!");
+						}
 					});
-				}).catch(() => {
-
-				});
-			},
-			//显示编辑界面
-			handleEdit: function (index, row) {
-				this.editFormVisible = true;
-				this.editForm = Object.assign({}, row);
-			},
-			//显示新增界面
-			handleAdd: function () {
-				console.log("我被处罚")
-				this.addFormVisible = true;
-				this.addForm = {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
-				};
-			},
-			//编辑
-			editSubmit: function () {
-				this.$refs.editForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.editLoading = true;
-							//NProgress.start();
-							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editUser(para).then((res) => {
-								this.editLoading = false;
-								//NProgress.done();
-								this.$message({
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['editForm'].resetFields();
-								this.editFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
-				});
-			},
-			//新增
-			addSubmit: function () {
-				this.$refs.addForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.addLoading = true;
-							//NProgress.start();
-							let para = Object.assign({}, this.addForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							addUser(para).then((res) => {
-								this.addLoading = false;
-								//NProgress.done();
-								this.$message({
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['addForm'].resetFields();
-								this.addFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
+				}).catch((error) => {
+					console.log(error);
 				});
 			},
 			selsChange: function (sels) {
@@ -298,24 +311,26 @@
 			},
 			//批量删除
 			batchRemove: function () {
-				var ids = this.sels.map(item => item.id).toString();
+				var ids = this.sels.map(item => item.id);
+				console.log(ids);
 				this.$confirm('确认删除选中记录吗？', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					//NProgress.start();
-					let para = { ids: ids };
-					batchRemoveUser(para).then((res) => {
+					http.del('/v1/user',{ids:ids}).then((res) => {
 						this.listLoading = false;
-						//NProgress.done();
-						this.$message({
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
+            if (res.status == "OK") {
+              this.$message({
+                message: "批量删除用户成功！",
+                 type: "success"
+              });
+							this.getUsers();
+            }else{
+							this.$message.error("批量删除用户失败!");
+						}
 					});
-				}).catch(() => {
-
+				}).catch((error) => {
+					console.log(error);
 				});
 			}
 		},
