@@ -32,7 +32,7 @@
 				</el-col>
 				<el-col :span="3">
 					<el-form-item label="功能">
-						<el-select v-model="queryForm.function" multiple  placeholder="功能">
+						<el-select v-model="queryForm.function"  placeholder="功能">
 							<el-option label="工作犬" value="工作犬"></el-option>
 							<el-option label="看家犬" value="看家犬"></el-option>
 							<el-option label="牧羊犬" value="牧羊犬"></el-option>
@@ -72,8 +72,11 @@
 						<el-col :span="1">元</el-col>
 					</el-form-item>	
 				</el-col>
-				<el-col :offset="3" :span="3">
-					<el-button type="primary" round @click="queryDog">查询</el-button>
+				<el-col :offset="3" :span="2">
+					<el-button type="primary" round @click="queryDog()">查询</el-button>
+				</el-col>
+				<el-col :offset="1" :span="2">
+					<el-button type="default" round @click="queryClear()">清空查询条件</el-button>
 				</el-col>
 			</el-row>
 		</el-form>
@@ -81,47 +84,7 @@
 		<div class="main-cons">
 				<div class="div-photo" v-for="item of dogList">
 					<img class="thumb" :src="item.url" @click="queryDogInfo(item.id)">
-					<div class="photo-text">{{item.name}}</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
-				</div>
-				<div class="div-photo">
-					<img class="thumb" :src="imgUrl">
-					<div class="photo-text">苏大强</div>
+					<div class="photo-text">{{item.breed}}</div>
 				</div>
 		</div>
 	</section>
@@ -136,9 +99,7 @@ import path from "@/common/constants/path.js"
 		},
 		data() {
 			return {
-				queryForm:{breed:'',original:'',shape:'',woolLength:'',function:''},
-				imgUrl:path.API_PATH  + 'image/user/J2PHrq8r7QR9/20190320154856_33918.jpg',
-				queryMap:{"breed":"","original":"","shape":"","woolLength":"","function":""},
+				queryForm:{breed:"",original:"",shape:"",woolLength:"",function:"",minLife:"",maxLife:"",minPrice:"",maxPrice:""},
 				pageNum:1,
 				pageSize:16,
 				dogList:[],
@@ -150,7 +111,7 @@ import path from "@/common/constants/path.js"
 			queryDog(){
 				this.dogList = [];
 				let url = '/v1/dogs/' + this.pageNum + '/' + this.pageSize;
-				http.post(url,this.queryMap).then((res)=>{
+				http.post(url,this.queryForm).then((res)=>{
 					console.log(res);
 					if(res.status == 'OK'){
 						for(let item of res.result){
@@ -170,6 +131,12 @@ import path from "@/common/constants/path.js"
 					path:'/dog/edit',
 					query:{id:dogId}
 				})
+			},
+			//清空查询条件
+			queryClear(){
+
+				this.queryForm={"breed":"","original":"","shape":"","woolLength":"","function":"","minLife":"",
+				"maxLife":"","minPrice":"","maxPrice":""};
 			}
 		}
 	}

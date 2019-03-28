@@ -1,136 +1,145 @@
 <template slot-scope>
-	<el-form ref="form" :model="form" label-width="80px" @submit.prevent="onSubmit" style="margin:20px;width:80%;min-width:600px;">
-		<el-col :span="20" :offset="1">
-			<el-row>
-				<el-col :span="8">
-					<el-form-item label="犬类品种">
-						<el-input v-model="form.breed"></el-input>
-					</el-form-item>
+	<section>
+		<el-row style="margin:20px;">
+			<el-col :span="2">
+				<el-button type="warning" @click="backPage">返回</el-button>					
+			</el-col>
+		</el-row>
+		<el-row>
+			<el-form ref="form" :model="form" label-width="80px" @submit.prevent="onSubmit" style="margin:20px;width:80%;min-width:600px;">
+				<el-col :span="20" :offset="1">
+					<el-row>
+						<el-col :span="8">
+							<el-form-item label="犬类品种">
+								<el-input v-model="form.breed"></el-input>
+							</el-form-item>
+						</el-col>
+						<el-col :span="7" :offset="2">
+							<el-form-item label="原产地">
+								<el-input v-model="form.original"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row >
+					<el-row>
+						<el-col :span="5">
+							<el-form-item label="活动区域">
+								<el-select v-model="form.shape" placeholder="体型">
+									<el-option label="小型" value="小型"></el-option>
+									<el-option label="中型" value="中型"></el-option>
+									<el-option label="大型" value="大型"></el-option>
+									<el-option label="超大型" value="超大型"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :span="5">
+							<el-form-item label="毛长">
+								<el-select v-model="form.woolLength" placeholder="毛长">
+									<el-option label="短毛" value="短毛"></el-option>
+									<el-option label="长毛" value="长毛"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+						<el-col :span="9">
+							<el-form-item label="功能">
+								<el-select v-model="funcSelected" multiple  placeholder="功能">
+									<el-option label="工作犬" value="工作犬"></el-option>
+									<el-option label="看家犬" value="看家犬"></el-option>
+									<el-option label="牧羊犬" value="牧羊犬"></el-option>
+									<el-option label="玩赏犬" value="玩赏犬"></el-option>
+									<el-option label="导盲犬" value="导盲犬"></el-option>
+									<el-option label="搜索犬" value="搜索犬"></el-option>
+									<el-option label="伴侣犬" value="伴侣犬"></el-option>
+									<el-option label="雪橇犬" value="雪橇犬"></el-option>
+									<el-option label="猎犬" value="猎犬"></el-option>
+									<el-option label="梗类犬" value="梗类犬"></el-option>
+								</el-select>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="9">
+						<el-form-item label="平均寿命">
+							<el-col :span="7">
+									<el-input v-model="form.minLife"></el-input>
+							</el-col>
+							<el-col :span="4">
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+							</el-col>
+							<el-col :span="7">
+									<el-input v-model="form.maxLife"></el-input>
+							</el-col>
+						</el-form-item>
+						</el-col>
+						<el-col :span="7">
+						<el-form-item label="平均价格">
+							<el-col :span="7" :offset="2">
+									<el-input v-model="form.minPrice"></el-input>
+							</el-col>
+							<el-col :span="4">
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
+							</el-col>
+							<el-col :span="7">
+									<el-input v-model="form.maxPrice"></el-input>
+							</el-col>
+						</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="15" >
+							<el-form-item label="犬类介绍">
+								<el-input type="textarea" :rows="8" placeholder="请输入介绍内容" v-model="form.description"></el-input>
+							</el-form-item>
+						</el-col>
+					</el-row>
+					<el-row>
+						<el-col :span="12">
+							<el-form-item label="图片相册">
+								<el-upload
+								class="upload-demo"
+								ref="batchUpload"
+								multiple
+								:action="uploadPhotosUrl"
+								list-type="picture"
+								:on-preview="handlePreview"
+								:on-remove="handleRemove"
+								:on-success="uploadPhotoSuccess"
+								:file-list="fileList"
+								:auto-upload="false">
+								<el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+								<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">上传到服务器</el-button>
+								<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
+								</el-upload>
+							</el-form-item>
+						</el-col>
+					</el-row>	
+					<el-row style="padding-top:200px">
+						<el-col :offset="24">
+						<el-form-item>
+							<el-button type="primary" @click="addSubmit">立即创建</el-button>
+						</el-form-item>
+						</el-col>
+					</el-row>
 				</el-col>
-				<el-col :span="7" :offset="2">
-					<el-form-item label="原产地">
-						<el-input v-model="form.original"></el-input>
-					</el-form-item>
+				<el-col :span="2">
+					<el-row>
+						<el-form-item prop="avatarUrl">
+							<img  :src="avatarUrl==''?defaultPhotoUrl:avatarUrl" style="width:200px;height:200px">
+						</el-form-item>
+					</el-row>
+					<el-row>
+						<el-col :span="2" :offset="5">
+							<el-form-item>
+								<el-upload class="myavatar" ref="upload" :action="uploadAvatarUrl" :show-file-list="false" :on-success="handleAvatarSuccess"
+									:before-upload="beforeAvatarUpload" :auto-upload="true"> 
+									<el-button type="primary">点击上传封面图</el-button>
+								</el-upload>
+							</el-form-item>
+						</el-col>
+					</el-row>
 				</el-col>
-			</el-row >
-			<el-row>
-				<el-col :span="5">
-					<el-form-item label="活动区域">
-						<el-select v-model="form.shape" placeholder="体型">
-							<el-option label="小型" value="小型"></el-option>
-							<el-option label="中型" value="中型"></el-option>
-							<el-option label="大型" value="大型"></el-option>
-							<el-option label="超大型" value="超大型"></el-option>
-						</el-select>
-					</el-form-item>
-				</el-col>
-				<el-col :span="5">
-					<el-form-item label="毛长">
-						<el-select v-model="form.woolLength" placeholder="毛长">
-							<el-option label="短毛" value="短毛"></el-option>
-							<el-option label="长毛" value="长毛"></el-option>
-						</el-select>
-					</el-form-item>
-				</el-col>
-				<el-col :span="9">
-					<el-form-item label="功能">
-						<el-select v-model="funcSelected" multiple  placeholder="功能">
-							<el-option label="工作犬" value="工作犬"></el-option>
-							<el-option label="看家犬" value="看家犬"></el-option>
-							<el-option label="牧羊犬" value="牧羊犬"></el-option>
-							<el-option label="玩赏犬" value="玩赏犬"></el-option>
-							<el-option label="导盲犬" value="导盲犬"></el-option>
-							<el-option label="搜索犬" value="搜索犬"></el-option>
-							<el-option label="伴侣犬" value="伴侣犬"></el-option>
-							<el-option label="雪橇犬" value="雪橇犬"></el-option>
-							<el-option label="猎犬" value="猎犬"></el-option>
-							<el-option label="梗类犬" value="梗类犬"></el-option>
-						</el-select>
-					</el-form-item>
-				</el-col>
-			</el-row>
-			<el-row>
-				<el-col :span="9">
-				<el-form-item label="平均寿命">
-					<el-col :span="7">
-							<el-input v-model="form.minLife"></el-input>
-					</el-col>
-					<el-col :span="4">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
-					</el-col>
-					<el-col :span="7">
-							<el-input v-model="form.maxLife"></el-input>
-					</el-col>
-				</el-form-item>
-				</el-col>
-				<el-col :span="7">
-				<el-form-item label="平均价格">
-					<el-col :span="7" :offset="2">
-							<el-input v-model="form.minPrice"></el-input>
-					</el-col>
-					<el-col :span="4">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~
-					</el-col>
-					<el-col :span="7">
-							<el-input v-model="form.maxPrice"></el-input>
-					</el-col>
-				</el-form-item>
-				</el-col>
-			</el-row>
-			<el-row>
-				<el-col :span="15" >
-					<el-form-item label="犬类介绍">
-						<el-input type="textarea" :rows="8" placeholder="请输入介绍内容" v-model="form.description"></el-input>
-					</el-form-item>
-				</el-col>
-			</el-row>
-			<el-row>
-				<el-col :span="12">
-					<el-form-item label="图片相册">
-						<el-upload
-						class="upload-demo"
-						ref="batchUpload"
-						multiple
-						:action="uploadPhotosUrl"
-						list-type="picture"
-						:on-preview="handlePreview"
-						:on-remove="handleRemove"
-						:on-success="uploadPhotoSuccess"
-						:file-list="fileList"
-						:auto-upload="false">
-						<el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-						<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">上传到服务器</el-button>
-						<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
-						</el-upload>
-					</el-form-item>
-				</el-col>
-			</el-row>	
-			<el-row style="padding-top:200px">
-				<el-col :offset="24">
-				<el-form-item>
-					<el-button type="primary" @click="addSubmit">立即创建</el-button>
-				</el-form-item>
-				</el-col>
-			</el-row>
-		</el-col>
-		<el-col :span="2">
-			<el-row>
-            	<el-form-item prop="avatarUrl">
-                	<img  :src="avatarUrl==''?defaultPhotoUrl:avatarUrl" style="width:200px;height:200px">
-            	</el-form-item>
-          	</el-row>
-			<el-row>
-            	<el-col :span="2" :offset="5">
-					<el-form-item>
-						<el-upload class="myavatar" ref="upload" :action="uploadAvatarUrl" :show-file-list="false" :on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload" :auto-upload="true"> 
-							<el-button type="primary">点击上传封面图</el-button>
-						</el-upload>
-					</el-form-item>
-            	</el-col>
-			</el-row>
-		</el-col>
-	</el-form>
+			</el-form>
+	</el-row>
+	</section>
 </template>
 
 <script>
@@ -257,6 +266,12 @@ import path from "@/common/constants/path.js"
 		submitBatchUpload(){
 			this.$refs.batchUpload.submit();
 		},
+		//返回主页
+		backPage(){
+			this.$router.push({
+				path:'/dog/list'
+			})
+		}
 		  
 	}
 	}

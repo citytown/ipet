@@ -2,7 +2,6 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
-import Table from './views/nav1/Table.vue'
 import Form from './views/nav1/Form.vue'
 import user from './views/nav1/user.vue'
 import Page4 from './views/nav2/Page4.vue'
@@ -34,7 +33,6 @@ let routes = [
         iconCls: 'el-icon-message',//图标样式class
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]
@@ -71,34 +69,15 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '',
+        name: '犬类管理',
         iconCls: 'el-icon-circle-plus',
-        leaf: true,//只有一个节点
         children: [
-            { path: '/dog/add', component: DogAddPage, name: '犬类增加' }
+            { path: '/dog/list', component: DogListPage, name: '犬类管理主页' },
+            { path: '/dog/add', component: DogAddPage, name: '犬类增加' },
+            { path: '/dog/edit', component: DogEditPage, name: '犬类修改' ,hidden: true}
         ]
     },
-    {
-        path: '/',
-        component: Home,
-        name: '',
-        iconCls: 'el-icon-circle-plus',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/dog/list', component: DogListPage, name: '犬类管理' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        hidden: true,
-        name: '',
-        iconCls: 'el-icon-circle-plus',
-        leaf: true,//只有一个节点
-        children: [
-            { path: '/dog/edit', component: DogEditPage, name: '犬类修改' }
-        ]
-    },
+
     {
         path: '*',
         hidden: true,
