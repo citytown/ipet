@@ -1,4 +1,4 @@
-<template>
+<template slot-scope="slot-scope">
   <section>
     <el-form
       :model="loginForm"
@@ -34,7 +34,7 @@
       title="用户注册"
       :visible.sync="registerFormVisible"
       :close-on-click-modal="false"
-      width="35%"
+      width="40%"
     >
       <el-form label-width="70px" :rules="registerRule" ref="registerForm" :model="registerForm">
         <el-col :span="12">
@@ -62,22 +62,23 @@
         <el-col :span="12">
           <el-row>
             <el-form-item prop="avatarUrl">
-              <el-upload
-                class="avatar-uploader"
-                action="/v1/upload/user/"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
-                :auto-upload="true"
-              >
-                <img v-if="this.registerForm.avatarUrl" :src="this.registerForm.avatarUrl" class="avatar">
-              </el-upload>
+                <img v-if="imgUrl" :src="imgUrl" style="width:200px;height:200px">
             </el-form-item>
           </el-row>
           <el-row>
             <el-col :offset="4">
               <el-form-item>
-                <el-button type="primary">上传头像</el-button>
+                 <el-upload
+                class="myavatar"
+                ref="upload"
+                :action="uploadUrl"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :auto-upload="true"
+                > 
+                  <el-button type="primary">点击上传头像</el-button>
+                </el-upload>
               </el-form-item>
             </el-col>
           </el-row>
@@ -93,7 +94,8 @@
 
 <script>
 import http from "@/api/http.js";
-//import NProgress from 'nprogress'
+import path from "@/common/constants/path.js"
+
 export default {
   data() {
     //校验确认密码
@@ -148,6 +150,7 @@ export default {
           //{ validator: validaePass2 }
         ]
       },
+      imgUrl:'https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg',
       registerForm: {
         id:"",
         username: "",
@@ -186,6 +189,7 @@ export default {
       },
       checked: true,
       registerFormVisible: false, //注册界面可见判断
+      uploadUrl:'', //文件上传路径
     };
   },
   methods: {
@@ -198,15 +202,14 @@ export default {
       this.$refs.loginForm.validate(valid => {
         sessionStorage.setItem("user", JSON.stringify({ username: "mike" }));
         if (valid) {
-          this.$router.push({
-            path: "/table"
-          });
+          /* this.$router.push({
+            path: "/list"
+          }); */
           //NProgress.start();
           var loginParam = {
             username: this.loginForm.username,
             password: this.loginForm.password
-          };
-          /*
+          };   
           this.logining = true;
           http
             .post("/v1/login", loginParam)
@@ -216,7 +219,7 @@ export default {
               if (res.status == "OK") {
                 sessionStorage.setItem("user", JSON.stringify(res.result));
                 this.$router.push({
-                  path: "/table"
+                  path: "/list"
                 });
               }
             })
@@ -225,27 +228,27 @@ export default {
               var content = "服務器異常，連接碼： " + error.response.status;
               this.$alert(content, "警告", {});
             });
-            */
+           
         } else {
           console.log("error submit!!");
           return false;
         }
       });
     },
+    //显示注册模态框
     showRegisterForm() {
-      //显示注册模态框
       http.get('/v1/randomId').then(res=>{
         console.log(res);
         if(res.status == 'OK')
         this.registerForm.id = res.result;
+        this.uploadUrl = '/v1/file/upload/user/'+res.result;
       }).catch(error=>{
         console.error(error);
       })
       this.registerFormVisible = true;
     },
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
-    },
+
+    //上传照片前
     beforeAvatarUpload(file) {
       //判断照片类型
       const isJPG = file.type === "image/jpeg";
@@ -258,6 +261,20 @@ export default {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
       return isJPG && isLt2M;
+    },
+
+    //上传成功后
+    handleAvatarSuccess(res, file) {
+      if(res.status == 'OK'){
+        this.registerForm.avatarUrl = res.result[0].url;
+        //this.imgUrl = URL.createObjectURL(file.raw);
+        this.imgUrl = path.API_PATH + res.result[0].url;
+        console.log(this.imgUrl);
+        this.$message.success('上传头像成功！');
+      }else{
+        console.log(res);
+        this.$message.error('上传头像失败！请联系管理员');
+      }
     },
     registerSubmit() {
       this.$refs.registerForm.validate(valid => {
@@ -317,6 +334,11 @@ export default {
     padding-left: 275px;
     font-size: 20px;
     font-weight: bold;
+  }
+ 
+  .myavatar {
+    width: 178px;
+    height: 178px;
   }
 }
 </style>

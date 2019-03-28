@@ -6,7 +6,7 @@
         :span="10"
         class="logo"
         :class="collapsed?'logo-collapse-width':'logo-width'"
-      >{{collapsed?'':sysName}}</el-col>
+      >{{collapsed?'':sysUserName}}</el-col>
       <el-col :span="10">
         <div class="tools" @click.prevent="collapse">
           <i class="fa fa-align-justify"></i>
@@ -15,8 +15,8 @@
       <el-col :span="4" class="userinfo">
         <el-dropdown trigger="hover">
           <span class="el-dropdown-link userinfo-inner">
-            <img :src="this.sysUserAvatar">
-            {{sysUserName}}
+            <img :src="sysUserAvatar">
+            {{sysNickName}}
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item divided @click.native="showInfoModifyForm">个人信息修改</el-dropdown-item>
@@ -137,38 +137,39 @@
       <el-col :span="12">
         <el-row>
           <el-form-item label="用户名" prop="username">
-            <el-input type="text" v-model="sysUserName" placeholder="账号"></el-input>
+            <el-input type="text" v-model="sysUserName" placeholder="账号" :disabled="true"></el-input>
           </el-form-item>
         </el-row>
         <el-row>
           <el-form-item label="昵称" prop="nickName">
-            <el-input type="text" v-model="sysUserName" placeholder="昵称"></el-input>
+            <el-input type="text" v-model="sysNickName" placeholder="昵称"></el-input>
           </el-form-item>
         </el-row>
       </el-col>
-      <el-col :span="12">
-        <el-row>
-          <el-form-item prop="avatarUrl">
-            <el-upload
-              class="avatar-uploader"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
-              :auto-upload="true"
-            >
-              <img v-if="sysUserAvatar" :src="sysUserAvatar" class="avatar">
-            </el-upload>
-          </el-form-item>
-        </el-row>
-        <el-row>
-          <el-col :offset="4">
-            <el-form-item>
-              <el-button type="primary">上传头像</el-button>
+        <el-col :span="12">
+          <el-row>
+            <el-form-item prop="sysUserAvatar">
+                <img v-if="sysUserAvatar" :src="sysUserAvatar" style="width:200px;height:200px">
             </el-form-item>
-          </el-col>
-        </el-row>
-      </el-col>
+          </el-row>
+          <el-row>
+            <el-col :offset="4">
+              <el-form-item>
+                 <el-upload
+                class="myavatar"
+                ref="upload"
+                :action="uploadUrl"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :auto-upload="true"
+                > 
+                  <el-button type="primary">点击上传头像</el-button>
+                </el-upload>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-col>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click.native="infoModifyFormVisible = false">取消</el-button>
@@ -209,6 +210,8 @@
 </template>
 
 <script>
+import http from "@/api/http.js";
+import path from "@/common/constants/path.js"
 export default {
   data() {
     //校验确认密码
@@ -222,11 +225,11 @@ export default {
       }
     };
     return {
-      sysName: "VUEADMIN",
       collapsed: false,
       sysUserName: "",
       sysUserAvatar: "",
       sysNickName: "",
+      avatarUrl:"",
 	  infoModifyFormVisible: false,
 	  modifying:false,
 	  modifyPasswordFormVisible: false,
@@ -260,7 +263,8 @@ export default {
         type: [],
         resource: "",
         desc: ""
-      }
+      },
+      uploadUrl:'/user',//头像上传地址
     };
   },
   methods: {
@@ -276,17 +280,32 @@ export default {
     handleselect: function(a, b) {},
     //打开修改信息模块框
     showInfoModifyForm() {
-		console.log('打开修改信息');
-      	this.infoModifyFormVisible = true;
+    console.log('打开修改信息');
+      this.uploadUrl = '/v1/file/upload/user/'+this.sysUserId;
+      this.infoModifyFormVisible = true;
     },
+
+    //修改个人信息
+    infoModifySubmit(){
+      let params={id:this.sysUserId,nickName:this.sysNickName,avatarUrl:this.avatarUrl};
+      http.put('/v1/user',params).then((res)=>{
+        console.log(res);
+        if(res.status == 'OK'){
+          this.$message.success('修改个人信息成功！');
+          this.infoModifyFormVisible = false;
+        }else{
+          this.$message.success('修改个人信息错误！请联系管理员');
+        }
+      })
+    },
+
     //打开修改密码模块框
     showPasswordModifyForm() {
 		console.log('打开修改密码');
       	this.modifyPasswordFormVisible = true;
-	},
-	handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
     },
+    
+    //上传照片前
     beforeAvatarUpload(file) {
       //判断照片类型
       const isJPG = file.type === "image/jpeg";
@@ -299,6 +318,20 @@ export default {
         this.$message.error("上传头像图片大小不能超过 2MB!");
       }
       return isJPG && isLt2M;
+    },
+
+    //上传成功后
+    handleAvatarSuccess(res, file) {
+      if(res.status == 'OK'){
+        this.avatarUrl = res.result[0].url;
+        //this.imgUrl = URL.createObjectURL(file.raw);
+        this.sysUserAvatar = path.API_PATH + res.result[0].url;
+        console.log(this.imgUrl);
+        this.$message.success('上传头像成功！');
+      }else{
+        console.log(res);
+        this.$message.error('上传头像失败！请联系管理员');
+      }
     },
     //退出登录
     logout: function() {
@@ -326,8 +359,11 @@ export default {
     var user = sessionStorage.getItem("user");
     if (user) {
       user = JSON.parse(user);
-      this.sysUserName = user.nickName || "";
-      this.sysUserAvatar = user.avatarUrl || "";
+      this.sysUserId = user.id||"";
+      this.sysUserName = user.username || "";
+      this.sysNickName = user.nickName || "";
+      this.sysUserAvatar = path.API_PATH + user.avatarUrl || "";
+      console.log(this.sysUserAvatar);
     }
   }
 };

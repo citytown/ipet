@@ -9,6 +9,9 @@ import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import UserList from './views/user/list.vue'
 import echarts from './views/charts/echarts.vue'
+import DogAddPage from './views/admin/dog/dog-add.vue';
+import DogEditPage from './views/admin/dog/dog-edit.vue';
+import DogListPage from './views/admin/dog/dog-list.vue';
 
 let routes = [
     {
@@ -63,6 +66,37 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/list', component: UserList, name: '用户管理' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'el-icon-circle-plus',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/dog/add', component: DogAddPage, name: '犬类增加' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'el-icon-circle-plus',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/dog/list', component: DogListPage, name: '犬类管理' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        hidden: true,
+        name: '',
+        iconCls: 'el-icon-circle-plus',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/dog/edit', component: DogEditPage, name: '犬类修改' }
         ]
     },
     {
