@@ -219,7 +219,7 @@ export default {
               if (res.status == "OK") {
                 sessionStorage.setItem("user", JSON.stringify(res.result));
                 this.$router.push({
-                  path: "/list"
+                  path: "/user/list"
                 });
               }
             })

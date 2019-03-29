@@ -105,7 +105,7 @@
 </template>
 
 <script>
-	import util from '../../common/js/util'
+	import util from '@/common/js/util.js'
 	import http from "@/api/http.js";
 
 	export default {
