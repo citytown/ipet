@@ -12,7 +12,7 @@
 						<el-input v-model="queryForm.original"></el-input>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="活动区域">
 						<el-select v-model="queryForm.shape" placeholder="体型">
 							<el-option label="小型" value="小型"></el-option>
@@ -22,7 +22,7 @@
 						</el-select>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="毛长">
 						<el-select v-model="queryForm.woolLength" placeholder="毛长">
 							<el-option label="短毛" value="短毛"></el-option>
@@ -30,7 +30,7 @@
 						</el-select>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="功能">
 						<el-select v-model="queryForm.function"  placeholder="功能">
 							<el-option label="工作犬" value="工作犬"></el-option>
@@ -48,7 +48,7 @@
 				</el-col>
 			</el-row>
 			<el-row :gutter="20">
-				<el-col :span="5">
+				<el-col :span="8">
 					<el-form-item label="平均寿命">
 						<el-col :span="9">
 								<el-input v-model="queryForm.minLife"></el-input>
@@ -60,7 +60,7 @@
 						<el-col :span="1">年</el-col>
 					</el-form-item>
 				</el-col>
-				<el-col :span="5">
+				<el-col :span="8">
 					<el-form-item label="平均价格">
 						<el-col :span="9" :offset="2">
 								<el-input v-model="queryForm.minPrice"></el-input>
@@ -72,7 +72,7 @@
 						<el-col :span="1">元</el-col>
 					</el-form-item>	
 				</el-col>
-				<el-col :offset="3" :span="2">
+				<el-col :offset="2" :span="2">
 					<el-button type="primary" round @click="queryDog()">查询</el-button>
 				</el-col>
 				<el-col :offset="1" :span="2">
@@ -164,7 +164,8 @@ import path from "@/common/constants/path.js"
 	.thumb{
 		width:100%;
 		height:85%;
-		object-fit:cover
+		object-fit:cover;
+		border-radius: 25px;
 	}
 	.photo-text{
 		text-align:center;

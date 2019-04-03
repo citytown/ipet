@@ -62,11 +62,11 @@
         <el-col :span="12">
           <el-row>
             <el-form-item prop="avatarUrl">
-                <img v-if="imgUrl" :src="imgUrl" style="width:200px;height:200px">
+                <img v-if="imgUrl" :src="imgUrl" style="width:150px;height:150px">
             </el-form-item>
           </el-row>
           <el-row>
-            <el-col :offset="4">
+            <el-col :offset="3">
               <el-form-item>
                  <el-upload
                 class="myavatar"
@@ -221,6 +221,8 @@ export default {
                 this.$router.push({
                   path: "/user/list"
                 });
+              }else{
+                this.$message.error(res.result);
               }
             })
             .catch(error => {

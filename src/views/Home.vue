@@ -128,7 +128,7 @@
     title="信息修改"
     :visible.sync="infoModifyFormVisible"
     :close-on-click-modal="false"
-    width="35%"
+    width="40%"
   >
     <el-form
       label-width="70px"
@@ -149,11 +149,11 @@
         <el-col :span="12">
           <el-row>
             <el-form-item prop="sysUserAvatar">
-                <img v-if="sysUserAvatar" :src="sysUserAvatar" style="width:200px;height:200px">
+                <img v-if="sysUserAvatar" :src="sysUserAvatar" style="width:150px;height:150px">
             </el-form-item>
           </el-row>
           <el-row>
-            <el-col :offset="4">
+            <el-col :offset="3">
               <el-form-item>
                  <el-upload
                 class="myavatar"
@@ -264,7 +264,7 @@ export default {
         resource: "",
         desc: ""
       },
-      uploadUrl:'/user',//头像上传地址
+      uploadUrl:'',//头像上传地址
     };
   },
   methods: {

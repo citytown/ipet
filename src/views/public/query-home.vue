@@ -165,7 +165,8 @@ import path from "@/common/constants/path.js"
 	.thumb{
 		width:100%;
 		height:85%;
-		object-fit:cover
+		object-fit:cover;
+		border-radius: 25px;
 	}
 	.photo-text{
 		text-align:center;

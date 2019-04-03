@@ -106,7 +106,7 @@
 								:file-list="fileList"
 								:auto-upload="false">
 								<el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-								<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">上传到服务器</el-button>
+								<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">点击上传</el-button>
 								<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
 								</el-upload>
 							</el-form-item>
@@ -152,7 +152,7 @@ import path from "@/common/constants/path.js"
 				uploadAvatarUrl:'',//上传封面地址
 				uploadPhotosUrl:'',//上传相册地址
 				defaultPhotoUrl: path.API_PATH + 'image/default/default.jpg',//默认照片
-				avatarUrl:'',
+				avatarUrl:path.API_PATH + 'image/default/default.jpg',//默认照片,
 				fileList: [],//狗照片相册列表
 				photoList:[],
 				funcSelected:[],

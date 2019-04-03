@@ -112,7 +112,7 @@
 								:file-list="fileList"
 								:auto-upload="false">
 								<el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-								<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">上传到服务器</el-button>
+								<el-button style="margin-left: 10px;" size="small" type="success" @click="submitBatchUpload">点击上传</el-button>
 								<div slot="tip" class="el-upload__tip">只能上传jpg/png文件</div>
 								</el-upload>
 							</el-form-item>
@@ -189,7 +189,6 @@ import path from "@/common/constants/path.js"
 							this.fileList.push(photo);
 						}
 					}
-					console.log(JSON.stringify(this.fileList));
 				}else{
 					this.$message.error("查询失败");
 				}
@@ -213,7 +212,6 @@ import path from "@/common/constants/path.js"
 							this.form.function =  this.form.function + "," + this.funcSelected[i];
 						}
 					}
-					console.log(JSON.stringify(this.form));
 					http.put('/v1/dog',this.form).then((res) => {
 						if (res.status == "OK") {
 							this.$message.success("更新成功!");
@@ -239,7 +237,6 @@ import path from "@/common/constants/path.js"
 							this.form.function =  this.form.function + "," + this.funcSelected[i];
 						}
 					}
-					console.log(JSON.stringify(this.form));
 					http.del('/v1/dog',{id:this.form.id}).then((res) => {
 						if (res.status == "OK") {
 							this.$message.success("删除成功!");
@@ -271,7 +268,6 @@ import path from "@/common/constants/path.js"
 		handleAvatarSuccess(res, file) {
 			if(res.status == 'OK'){
 				this.avatarUrl = path.API_PATH + res.result[0].url;
-				console.log(this.avatarUrl);
 				this.$message.success('上传头像成功！');
 			}else{
 				console.log(res);
@@ -279,7 +275,6 @@ import path from "@/common/constants/path.js"
 			}
 		},
 		handleRemove(file, fileList) {
-			console.log(file);
 			let ids =[file.id];
 			http.del('/v1/file/batchDel',{ids:ids}).then((res) => {
 				if (res.status != "OK") {

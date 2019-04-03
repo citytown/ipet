@@ -9,8 +9,8 @@
                <el-tooltip class="item" effect="dark" content="点击取消收藏" placement="top" v-if="remark.collect== 1">
                   <img class="collection" src="../../assets/collection.png" @click="collectionSubmit" v-if="remark.collect==1">
                </el-tooltip>
-               <el-tooltip class="item" effect="dark" content="点击收藏" placement="top" v-if="remark.collect== null">
-                  <img class="collection" src="../../assets/nocollection.png" @click="collectionSubmit" v-if="remark.collect== null">
+               <el-tooltip class="item" effect="dark" content="点击收藏" placement="top" v-if="remark.collect== 0">
+                  <img class="collection" src="../../assets/nocollection.png" @click="collectionSubmit" v-if="remark.collect== 0">
                </el-tooltip>
                <el-button type="primary" @click="remarkVisible = true">笔记</el-button>
             </div>
@@ -38,13 +38,13 @@
           </el-row>
         </el-col>
         <el-col :span="5">
-            <img class="avatar" src= "https://gss1.bdstatic.com/9vo3dSag_xI4khGkpoWK1HF6hhy/baike/w%3D268%3Bg%3D0/sign=616a5025b03eb13544c7b0bd9e25cfee/58ee3d6d55fbb2fba27624df434a20a44723dc9a.jpg">
+            <img class="avatar" :src= "avatarUrl">
         </el-col>
       </el-row>
       <div class="dog-text">简介：</div>
       <el-row>
         <el-col :span="20">
-          <div class="descri">{{dog.descrition}}</div>
+          <div class="descri">{{dog.description}}</div>
         </el-col>
       </el-row>
       <el-row>
@@ -97,9 +97,10 @@ import path from "@/common/constants/path.js"
       return{
         loginUser:{},
         dog:{id:'',breed:'',original:'',shape:'',woolength:'',minLife:'',maxLife:'',minPrice:'',maxPrice:"",descrition:""},
-        
-        photos:[{title:'Image1',url:'https://gss2.bdstatic.com/9fo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike92%2C5%2C5%2C92%2C30/sign=01684b12841001e95a311c5dd9671089/aa18972bd40735fa44694c4297510fb30e2408ab.jpg'}],
-        remark:{id:'11',dogId:'11',userId:'213',collect:null,content:''},
+        defaultPhotoUrl: path.API_PATH + 'image/default/default.jpg',//默认照片
+        avatarUrl:path.API_PATH + 'image/default/default.jpg',//默认照片,
+        photos:[],
+        remark:{id:'',dogId:'',userId:'',collect:0,content:''},
         remarkVisible:false
      }
     },
@@ -108,6 +109,7 @@ import path from "@/common/constants/path.js"
 		getDogInfo(){
 			http.get('/v1/dog/'+this.dog.id).then(res=>{
 				if(res.status == 'OK'){
+          console.log(res)
 					this.dog = res.result.dogInfo;
 					this.funcSelected = this.dog.function.split(",");
 					let photos = res.result.photos;
@@ -117,11 +119,11 @@ import path from "@/common/constants/path.js"
 							photos.splice(0,1);
 						}
 						for(let item of photos){
-							let photo ={id:item.id,name:item.name,url:path.API_PATH + item.url};
-							this.fileList.push(photo);
+							let photo ={title:item.name,url:path.API_PATH + item.url};
+							this.photos.push(photo);
 						}
 					}
-					console.log(JSON.stringify(this.fileList));
+					console.log(JSON.stringify(this.photos));
 				}else{
 					this.$message.error("查询失败");
 				}
@@ -133,23 +135,48 @@ import path from "@/common/constants/path.js"
     //获取当前用户对该犬类的备注收藏信息
     getRemarkInfo(){
       http.get("/v1/collectionAndMark/"+this.loginUser.id + "/" + this.dog.id).then(res=>{
-        console.log(res);
+        if(res.status == 'OK'){
+          this.remark = res.result;
+          console.log(this.remark);
+
+        }else{
+          this.$message.error("查询备注收藏出错");
+        }
       }).catch(err=>{
         this.$message.error("服务器出错");
       })
     },
       //收藏提交
       collectionSubmit(){
-        console.log('我被出发');
         if(this.remark.collect == 1){
-          this.remark.collect = null;
+          this.remark.collect = 0;
         }else{
           this.remark.collect = 1;
         }
+        http.put("/v1/collection",this.remark).then(res=>{
+          console.log(res);
+          if(res.status == 'OK'){
+            this.$message.success("操作成功");
+          }else{
+            this.$message.error("操作失败");
+          }
+        }).catch(err=>{
+          this.$message.error("服务器出错");
+        })
       },
       //备注提交
       remarkSubmit(){
-
+        http.put("/v1/mark",this.remark).then(res=>{
+          console.log(res);
+          if(res.status == 'OK'){
+            this.$message.success("添加笔记成功");
+            this.remarkVisible = false;
+          }else{
+            this.$message.error("添加笔记失败");
+          }
+        }).catch(err=>{
+          this.$message.error("服务器出错");
+        })
       }
     }
   }

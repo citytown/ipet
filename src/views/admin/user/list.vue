@@ -21,16 +21,16 @@
 			</el-table-column>
 			<el-table-column type="index" width="60">
 			</el-table-column>
-			<el-table-column prop="id" label="id" width="370" sortable>
+			<el-table-column prop="id" label="id" width="300" sortable>
 			</el-table-column>
-			<el-table-column prop="username" label="账号" width="370" sortable>
+			<el-table-column prop="username" label="账号" width="300" sortable>
 			</el-table-column>
-			<el-table-column prop="password" label="密码" width="370" sortable>
+			<el-table-column prop="password" label="密码" width="300" sortable>
 			</el-table-column>
-			<el-table-column prop="nickName" label="昵称" width="370" sortable>
+			<el-table-column prop="nickName" label="昵称" width="300" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
-				<template slot-scope>
+				<template slot-scope="scope">
 					<!--<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
 					<el-button type="danger" size="small" @click="delUser(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -79,8 +79,11 @@
             <el-form-item prop="avatarUrl">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
+								ref="upload"
+                :action="uploadUrl"
                 :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
                 :auto-upload="true"
               >
                 <img v-if="addForm.avatarUrl" :src="addForm.avatarUrl" class="avatar">
@@ -147,6 +150,7 @@
 				page: 1,
 				listLoading: false,
 				sels: [],//列表选中列
+				uploadUrl:'',//头像上传地址
 
 
 				addFormVisible: false,//新增界面是否显示
@@ -230,6 +234,7 @@
 			},
 			//显示新增界面
 			handleAdd: function () {
+				this.uploadUrl = '/v1/file/upload/user/'+this.addForm.id;
 				this.addFormVisible = true;
 				//新增界面数据
       	this.addForm={
@@ -332,12 +337,40 @@
 				}).catch((error) => {
 					console.log(error);
 				});
-			}
-		},
-		mounted() {
-			this.getUsers();
-		}
+			},
+    //上传照片前
+    beforeAvatarUpload(file) {
+      //判断照片类型
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
+
+    //上传成功后
+    handleAvatarSuccess(res, file) {
+      if(res.status == 'OK'){
+        this.avatarUrl = res.result[0].url;
+        //this.imgUrl = URL.createObjectURL(file.raw);
+        this.sysUserAvatar = path.API_PATH + res.result[0].url;
+        console.log(this.imgUrl);
+        this.$message.success('上传头像成功！');
+      }else{
+        console.log(res);
+        this.$message.error('上传头像失败！请联系管理员');
+      }
+    },
+	},
+	mounted() {
+		this.getUsers();
 	}
+}
 
 </script>
 
