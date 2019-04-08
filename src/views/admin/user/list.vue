@@ -19,15 +19,17 @@
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
-			<el-table-column type="index" width="60">
+			<el-table-column type="index" label="序号" width="60">
 			</el-table-column>
-			<el-table-column prop="id" label="id" width="300" sortable>
+			<el-table-column prop="username" label="账号" width="200" sortable>
 			</el-table-column>
-			<el-table-column prop="username" label="账号" width="300" sortable>
+			<el-table-column prop="password" label="密码" width="200" sortable>
 			</el-table-column>
-			<el-table-column prop="password" label="密码" width="300" sortable>
+			<el-table-column prop="nickName" label="昵称" width="200" sortable>
 			</el-table-column>
-			<el-table-column prop="nickName" label="昵称" width="300" sortable>
+			<el-table-column prop="registerDate" label="注册时间" width="200" sortable>
+			</el-table-column>
+			<el-table-column prop="lastLoginDate" label="最后登陆时间" width="200" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template slot-scope="scope">
@@ -77,23 +79,20 @@
         <el-col :span="12">
           <el-row>
             <el-form-item prop="avatarUrl">
-              <el-upload
-                class="avatar-uploader"
-								ref="upload"
-                :action="uploadUrl"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
-                :auto-upload="true"
-              >
-                <img v-if="addForm.avatarUrl" :src="addForm.avatarUrl" class="avatar">
-              </el-upload>
+                <img  :src="imgUrl" style="width:150px;height:150px">
             </el-form-item>
           </el-row>
           <el-row>
-            <el-col :offset="4">
+            <el-col :offset="3">
               <el-form-item>
-                <el-button type="primary">上传头像</el-button>
+                 <el-upload class="myavatar"
+                ref="upload" :action="uploadUrl" :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+                :auto-upload="true"
+                > 
+                  <el-button type="primary">点击上传头像</el-button>
+                </el-upload>
               </el-form-item>
             </el-col>
           </el-row>
@@ -108,8 +107,9 @@
 </template>
 
 <script>
-	import util from '@/common/js/util.js'
-	import http from "@/api/http.js";
+import util from '@/common/js/util.js'
+import http from "@/api/http.js";
+import path from "@/common/constants/path.js"
 
 	export default {
 		data() {
@@ -155,6 +155,9 @@
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
+				imgUrl: path.API_PATH + 'image/default/default.jpg',//默认照片,
+				//新增界面数据
+				addForm: {id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:""},
 				addFormRules: {
 					username: [
 						{
@@ -183,15 +186,6 @@
 						}
 					]
 				},
-				//新增界面数据
-      	addForm: {
-        	id:"",
-        	username: "",
-        	password: "",
-       	 	passwordConfirm: "",
-        	nickName: "",
-        	avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
-      	},
 			}
 		},
 		methods: {
@@ -234,24 +228,18 @@
 			},
 			//显示新增界面
 			handleAdd: function () {
-				this.uploadUrl = '/v1/file/upload/user/'+this.addForm.id;
+				this.imgUrl=path.API_PATH + 'image/default/default.jpg',
+				this.addForm = {id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:""},
 				this.addFormVisible = true;
 				//新增界面数据
-      	this.addForm={
-					id:"",
-        	username: "",
-        	password: "",
-       	 	passwordConfirm: "",
-        	nickName: "",
-        	avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
-				};
 				http.get('/v1/randomId').then(res=>{
 					console.log(res);
         	if(res.status == 'OK')
 					this.addForm.id = res.result;
-					this.getUsers();
+					this.uploadUrl = '/v1/file/upload/user/'+this.addForm.id;
       	}).catch(error=>{
 					console.error(error);
+					this.$message.error('服务器出错');
      	 })
 			 this.$nextTick(()=>{
    				this.$refs['addForm'].resetFields();
@@ -356,9 +344,9 @@
     //上传成功后
     handleAvatarSuccess(res, file) {
       if(res.status == 'OK'){
-        this.avatarUrl = res.result[0].url;
+        this.addForm.avatarUrl = res.result[0].url;
         //this.imgUrl = URL.createObjectURL(file.raw);
-        this.sysUserAvatar = path.API_PATH + res.result[0].url;
+        this.imgUrl = path.API_PATH + res.result[0].url;
         console.log(this.imgUrl);
         this.$message.success('上传头像成功！');
       }else{

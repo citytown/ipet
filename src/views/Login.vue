@@ -62,7 +62,7 @@
         <el-col :span="12">
           <el-row>
             <el-form-item prop="avatarUrl">
-                <img v-if="imgUrl" :src="imgUrl" style="width:150px;height:150px">
+                <img  :src="imgUrl" style="width:150px;height:150px">
             </el-form-item>
           </el-row>
           <el-row>
@@ -139,7 +139,6 @@ export default {
             message: "请输入账号",
             trigger: "blur"
           }
-          //{ validator: validaeUsername }
         ],
         password: [
           {
@@ -147,18 +146,10 @@ export default {
             message: "请输入密码",
             trigger: "blur"
           }
-          //{ validator: validaePass2 }
         ]
       },
-      imgUrl:'https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg',
-      registerForm: {
-        id:"",
-        username: "",
-        password: "",
-        passwordConfirm: "",
-        nickName: "",
-        avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"
-      },
+      imgUrl: path.API_PATH + 'image/default/default.jpg',//默认照片,
+      registerForm: {id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:""},
       registerRule: {
         username: [
           {
@@ -200,12 +191,7 @@ export default {
     //用户登录
     loginSubmit() {
       this.$refs.loginForm.validate(valid => {
-        sessionStorage.setItem("user", JSON.stringify({ username: "mike" }));
         if (valid) {
-          /* this.$router.push({
-            path: "/list"
-          }); */
-          //NProgress.start();
           var loginParam = {
             username: this.loginForm.username,
             password: this.loginForm.password
@@ -219,7 +205,7 @@ export default {
               if (res.status == "OK") {
                 sessionStorage.setItem("user", JSON.stringify(res.result));
                 this.$router.push({
-                  path: "/user/list"
+                  path: "/public/home"
                 });
               }else{
                 this.$message.error(res.result);
@@ -239,6 +225,8 @@ export default {
     },
     //显示注册模态框
     showRegisterForm() {
+      this.imgUrl = path.API_PATH + 'image/default/default.jpg',//默认照片,
+      this.registerForm={id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:""};
       http.get('/v1/randomId').then(res=>{
         console.log(res);
         if(res.status == 'OK')
@@ -246,8 +234,12 @@ export default {
         this.uploadUrl = '/v1/file/upload/user/'+res.result;
       }).catch(error=>{
         console.error(error);
+        this.$message.error("服务器出错！");
       })
       this.registerFormVisible = true;
+      this.$nextTick(()=>{
+        this.$refs.registerForm.clearValidate();
+      })
     },
 
     //上传照片前
@@ -292,7 +284,6 @@ export default {
                   message: "注册成功！",
                   type: "success"
                 });
-                this.registerForm={id:"",username: "",password: "",passwordConfirm: "",nickName: "",avatarUrl:"https://www.qqtouxiang.com/d/file/tupian/mx/20170713/jim4yidr31tak.jpg"};
               }
               this.registering = false;
               this.registerFormVisible = false;

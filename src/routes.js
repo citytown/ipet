@@ -2,9 +2,6 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 
-import Page4 from './views/nav2/Page4.vue'
-import Page5 from './views/nav2/Page5.vue'
-import echarts from './views/charts/echarts.vue'
 //公共模块
 import PublicHome from   './views/public/query-home.vue'
 import PublicDetail from   './views/public/query-detail.vue'
@@ -39,26 +36,6 @@ let routes = [
         hidden: true
     },
     //{ path: '/main', component: Main },
-
-    {
-        path: '/',
-        component: Home,
-        name: '导航二',
-        iconCls: 'fa fa-id-card-o',
-        children: [
-            { path: '/page4', component: Page4, name: '页面4' },
-            { path: '/page5', component: Page5, name: '页面5' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: 'Charts',
-        iconCls: 'fa fa-bar-chart',
-        children: [
-            { path: '/echarts', component: echarts, name: 'echarts' }
-        ]
-    },
 
     {
         path: '/',
@@ -99,8 +76,17 @@ let routes = [
         children: [
             { path: '/dog/list', component: DogListPage, name: '犬类管理主页' },
             { path: '/dog/add', component: DogAddPage, name: '犬类增加' },
-            { path: '/dog/edit', component: DogEditPage, name: '犬类修改' ,hidden: true},
-            { path: '/user/list', component: UserList, name: '用户管理' }
+            { path: '/dog/edit', component: DogEditPage, name: '犬类修改' ,hidden: true}
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'fa fa-address-card',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/user/list', component: UserList, name: '用户管理' },
         ]
     },
     {

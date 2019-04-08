@@ -33,6 +33,11 @@
           </el-row>
           <el-row>
             <el-col :span="10">
+              <div class="dog-text">功能：{{dog.function}}</div>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="10">
               <div class="dog-text">平均寿命：{{dog.minLife}}&nbsp;~&nbsp;{{dog.maxLife}}&nbsp;年</div>
             </el-col>
           </el-row>

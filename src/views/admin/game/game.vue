@@ -18,9 +18,7 @@
 		<el-table :data="games" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
-			<el-table-column type="index" width="60">
-			</el-table-column>
-			<el-table-column prop="id" label="id" width="150" sortable>
+			<el-table-column type="index" label="序号" width="60">
 			</el-table-column>
 			<el-table-column prop="content" label="题目" width="900" sortable>
 			</el-table-column>
