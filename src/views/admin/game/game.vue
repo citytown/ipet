@@ -22,7 +22,7 @@
 			</el-table-column>
 			<el-table-column prop="content" label="题目" width="900" sortable>
 			</el-table-column>
-			<el-table-column label="操作" width="150">
+			<el-table-column label="操作" width="200">
 				<template slot-scope="scope">
 						<el-button type="primary" size="small" @click="editGameForm(scope.$index, scope.row)">编辑</el-button>
 						<el-button type="danger" size="small" @click="delGame(scope.$index, scope.row)">删除</el-button>
@@ -111,21 +111,22 @@ import path from "@/common/constants/path.js"
 import http from "@/api/http.js";
 export default {
 	mounted() {
-		this.loginUser = JSON.parse(sessionStorage.getItem("user"));
-		console.log('当前登录用户：' + this.loginUser)
-		if (this.loginUser) {
-			this.getGames();
-			this.uploadUrl = '/v1/file/upload/user/' + this.loginUser.id;
+	this.loginUser = JSON.parse(sessionStorage.getItem("user"));
+      if(this.loginUser.roleId == 0){
+        this.$router.push({
+          path:'/non-privileged'
+        })
+      }else{
+				this.getGames();
+				this.uploadUrl = '/v1/file/upload/user/' + this.loginUser.id;
 		}
 	},
 	data() {
 		//校验确认密码
-		var validatePassConfirm = (rule, value, callback) => {
-			if (value === "") {
-				callback(new Error("请再次输入密码"));
-			} else if (value !== this.form.password) {
-				callback(new Error("两次输入密码不一致!"));
-			} else {
+		var rightChoiceVali = (rule, value, callback) => {
+			if (value != '1' || alue != '2'|| alue != '3'|| alue != '4') {
+				callback(new Error("只能填写1,2,3,4四个数字"));
+			}else {
 				callback();
 			}
 		};
@@ -167,9 +168,8 @@ export default {
 					trigger: "blur"
 				}],
 				rightChoice: [{
-					required: true,
-					message: "请输入正确选项",
-					trigger: "blur"
+					trigger: "blur",
+					validator:rightChoiceVali,
 				}]
 			},
 			imgUrl:'',

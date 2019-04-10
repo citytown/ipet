@@ -1,6 +1,6 @@
 <template slot-scope>
 	<section>
-		<el-form :model="queryForm" label-position="center" label-width="70px">
+		<el-form :model="queryForm" label-position="center" label-width="70px" style="margin-top:20px;">
 			<el-row :gutter="20">
 				<el-col :span="5">
 					<el-form-item label="犬类品种">
@@ -94,9 +94,16 @@
 import http from "@/api/http.js";
 import path from "@/common/constants/path.js"
 	export default {
-		mounted(){
-			this.queryDog();
-		},
+	mounted(){
+      this.loginUser = JSON.parse(sessionStorage.getItem("user"));
+      if(this.loginUser.roleId == 0){
+        this.$router.push({
+          path:'/non-privileged'
+        })
+      }else{
+		this.queryDog();
+	  }
+	},
 		data() {
 			return {
 				queryForm:{breed:"",original:"",shape:"",woolLength:"",function:"",minLife:"",maxLife:"",minPrice:"",maxPrice:""},

@@ -27,6 +27,8 @@
 			</el-table-column>
 			<el-table-column prop="nickName" label="昵称" width="200" sortable>
 			</el-table-column>
+			<el-table-column prop="roleType" label="用户身份" width="200" sortable>
+			</el-table-column>
 			<el-table-column prop="registerDate" label="注册时间" width="200" sortable>
 			</el-table-column>
 			<el-table-column prop="lastLoginDate" label="最后登陆时间" width="200" sortable>
@@ -113,6 +115,39 @@ import path from "@/common/constants/path.js"
 
 	export default {
 		data() {
+    //校验用户名是否已经被注册
+    var validateUsername = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入账号"));
+      }else if(value.length > 20){
+        callback(new Error("用户名长度不能超过20个字符"));
+      } else {
+        http
+          .get("/v1/checkUser/" + value)
+          .then(res => {
+            console.log(res.status);
+            if (res.status == "OK") {     
+                callback();
+            }else{
+              callback(new Error("该用户名已存在"));
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    };
+    //校验密码格式 
+    var passPatternValid = (rule, value, callback) => {
+      var pattern = /^[a-zA-Z0-9_]{1,}$/; 
+      if (value.length < 3 || value.length > 16) {
+        callback(new Error("密码长度不能小于3位并且不能大于16位"));
+      } else if (!value.match(pattern)) {
+        callback(new Error("密码只能包含数字，字母大小写和下划线"));
+      } else {
+        callback();
+      }
+    };
 			//校验确认密码
 			var validatePassConfirm = (rule, value, callback) => {
 				if (value === "") {
@@ -121,26 +156,6 @@ import path from "@/common/constants/path.js"
 					callback(new Error("两次输入密码不一致!"));
 				} else {
 					callback();
-				}
-			};
-			//校验用户名是否已经被注册
-			var validaeUsername = (rule, value, callback) => {
-				if (value === "") {
-					callback(new Error("请输入账号"));
-				} else {
-					http
-						.get("/v1/checkUser/" + value)
-						.then(res => {
-							console.log(res.status);
-							if (res.status == "OK") {
-								callback();
-							}else{
-								callback(new Error("该用户名已存在"));
-							}
-						})
-						.catch(error => {
-							console.log(error);
-						});
 				}
 			};
 			return {
@@ -161,14 +176,13 @@ import path from "@/common/constants/path.js"
 				addFormRules: {
 					username: [
 						{
-							validator: validaeUsername,
+							validator: validateUsername,
 							trigger: "blur"
 						}
 					],
 					password: [
 						{
-							required: true,
-							message: "请输入密码",
+							validator: passPatternValid,
 							trigger: "blur"
 						}
 					],
@@ -200,7 +214,14 @@ import path from "@/common/constants/path.js"
 				http.get('/v1/users/'+this.page + '/20').then((res) => {
 					if(res.status == 'OK'){
 						this.total = res.result.total;
-						this.users = res.result.rows;
+						this.users = res.result.rows.map(item=>{
+							if(item.roleId == 1){
+								item.roleType= '管理员';
+							}else{
+								item.roleType= '普通用户';
+							}
+							return item;
+						});
 						this.listLoading = false;
 					}else{
 						this.$message.error("查询用户失败!");
@@ -277,6 +298,10 @@ import path from "@/common/constants/path.js"
 		},
 			//删除用户
 			delUser: function (index, row) {
+				if(this.users[index].roleId == 1){
+					this.$message.error("管理员账号不能被删除！");
+					return;
+				}
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
@@ -304,7 +329,15 @@ import path from "@/common/constants/path.js"
 			},
 			//批量删除
 			batchRemove: function () {
-				var ids = this.sels.map(item => item.id);
+				let ids = [];
+				for(let i = 0 ;i< this.sels.length;i++){
+					if(this.sels[i].roleId == 1){
+						this.$message.error("管理员账号不能被删除！");
+						return;
+					}else{
+						ids.push(this.sels[i].id);
+					}
+				}
 				console.log(ids);
 				this.$confirm('确认删除选中记录吗？', '提示', {
 					type: 'warning'
@@ -356,7 +389,14 @@ import path from "@/common/constants/path.js"
     },
 	},
 	mounted() {
-		this.getUsers();
+      this.loginUser = JSON.parse(sessionStorage.getItem("user"));
+      if(this.loginUser.roleId == 0){
+        this.$router.push({
+          path:'/non-privileged'
+        })
+      }else{		
+				this.getUsers();
+			}
 	}
 }
 

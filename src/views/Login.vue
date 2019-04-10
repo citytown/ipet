@@ -97,7 +97,40 @@ import http from "@/api/http.js";
 import path from "@/common/constants/path.js"
 
 export default {
-  data() {
+  data() {  
+    //校验用户名是否已经被注册
+    var validaeUsername = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入账号"));
+      }else if(value.length > 20){
+        callback(new Error("用户名长度不能超过20个字符"));
+      } else {
+        http
+          .get("/v1/checkUser/" + value)
+          .then(res => {
+            console.log(res.status);
+            if (res.status == "OK") {     
+                callback();
+            }else{
+              callback(new Error("该用户名已存在"));
+            }
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
+    };
+    //校验密码格式 
+    var passPatternValid = (rule, value, callback) => {
+      var pattern = /^[a-zA-Z0-9_]{1,}$/; 
+      if (value.length < 3) {
+        callback(new Error("密码长度不能小于3位"));
+      } else if (!value.match(pattern)) {
+        callback(new Error("密码只能包含数字，字母大小写和下划线"));
+      } else {
+        callback();
+      }
+    };
     //校验确认密码
     var validatePassConfirm = (rule, value, callback) => {
       if (value === "") {
@@ -106,26 +139,6 @@ export default {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
-      }
-    };
-    //校验用户名是否已经被注册
-    var validaeUsername = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入账号"));
-      } else {
-        http
-          .get("/v1/checkUser/" + value)
-          .then(res => {
-            console.log(res.status);
-            if (res.status == "OK") {
-              callback();
-            }else{
-              callback(new Error("该用户名已存在"));
-            }
-          })
-          .catch(error => {
-            console.log(error);
-          });
       }
     };
     return {
@@ -159,8 +172,7 @@ export default {
         ],
         password: [
           {
-            required: true,
-            message: "请输入密码",
+            validator: passPatternValid,
             trigger: "blur"
           }
         ],

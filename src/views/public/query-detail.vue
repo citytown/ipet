@@ -1,4 +1,4 @@
-<template slot-scope>
+<template>
   <section>
     <div class="mycontainer">
       <el-row>

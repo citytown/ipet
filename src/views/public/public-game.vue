@@ -1,4 +1,4 @@
-<template slot-scope>
+<template>
 	<section>
 		<el-row>
 			<el-col :offset="8">
@@ -105,7 +105,7 @@ import path from "@/common/constants/path.js"
 
 </script>
 
-<style slot-scope="scope">
+<style>
 .img{
 	max-width: 400px;
 	max-height: 400px;

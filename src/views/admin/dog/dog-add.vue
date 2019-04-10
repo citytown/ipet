@@ -68,6 +68,7 @@
 							<el-col :span="7">
 									<el-input v-model="form.maxLife"></el-input>
 							</el-col>
+							<el-col :span="1" :offset="1">年</el-col>
 						</el-form-item>
 						</el-col>
 						<el-col :span="7">
@@ -81,6 +82,7 @@
 							<el-col :span="7">
 									<el-input v-model="form.maxPrice"></el-input>
 							</el-col>
+							<el-col :span="1" :offset="1">元</el-col>
 						</el-form-item>
 						</el-col>
 					</el-row>
@@ -160,6 +162,12 @@ import path from "@/common/constants/path.js"
 		},
 	//初始化
 	mounted() {
+      this.loginUser = JSON.parse(sessionStorage.getItem("user"));
+      if(this.loginUser.roleId == 0){
+        this.$router.push({
+          path:'/non-privileged'
+        })
+      }else{
 		http.get('/v1/randomId').then(res=>{
         	console.log(res);
         	if(res.status == 'OK')
@@ -169,7 +177,8 @@ import path from "@/common/constants/path.js"
      		}).catch(error=>{
 			console.error(error);
 			this.$message.error('服务器出错，请联系管理员！');
-      	})
+		  })
+	  }
 	},	
 	methods: {
 		//提交狗

@@ -16,7 +16,7 @@
         <el-dropdown trigger="hover">
           <span class="el-dropdown-link userinfo-inner">
             <img :src="sysUserAvatar">
-            {{sysNickName}}
+            您好，{{sysNickName}}
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item divided @click.native="showInfoModifyForm">个人信息修改</el-dropdown-item>
@@ -180,29 +180,29 @@
       <!--密码修改-->
     <el-dialog
       title="密码修改"
-      :visible.sync="modifyPasswordFormVisible"
+      :visible.sync="passwordFormVisible"
       :close-on-click-modal="false"
       width="35%"
     >
-      <el-form label-width="78px" :rules="modifyPasswordRule" ref="modifyPasswordForm" >
+      <el-form :model="passwordForm" label-width="78px" :rules="modifyPasswordRule" ref="passwordForm" >
           <el-row>
             <el-form-item label="旧密码" prop="oldPassword" class="pass">
-              <el-input type="text" v-model="oldPassword" placeholder="旧密码"></el-input>
+              <el-input type="text" v-model="passwordForm.oldPassword" placeholder="旧密码"></el-input>
             </el-form-item>
           </el-row>
           <el-row>
             <el-form-item label="新密码" prop="newPassword" class="pass">
-              <el-input type="text" v-model="newPassword" placeholder="旧密码"></el-input>
+              <el-input type="text" v-model="passwordForm.newPassword" placeholder="旧密码"></el-input>
             </el-form-item>
           </el-row>
           <el-row>
             <el-form-item label="密码确认" prop="passwordConfirm">
-              <el-input type="text" v-model="passwordConfirm" placeholder="密码确认"></el-input>
+              <el-input type="text" v-model="passwordForm.passwordConfirm" placeholder="密码确认"></el-input>
             </el-form-item>
           </el-row>
 	  </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click.native="modifyPasswordFormVisible = false">取消</el-button>
+        <el-button @click.native="passwordFormVisible = false">取消</el-button>
         <el-button type="primary" @click.native="modifyPasswordSubmit" :loading="modifying">提交</el-button>
       </div>
     </el-dialog>
@@ -214,11 +214,24 @@ import http from "@/api/http.js";
 import path from "@/common/constants/path.js"
 export default {
   data() {
+
+    //校验密码格式 
+    var passPatternValid = (rule, value, callback) => {
+      var pattern = /^[a-zA-Z0-9_]{1,}$/; 
+      console.log(value);
+      if (value.length < 3) {
+        callback(new Error("密码长度不能小于3位"));
+      } else if (!value.match(pattern)) {
+        callback(new Error("密码只能包含数字，字母大小写和下划线"));
+      } else {
+        callback();
+      }
+    };
     //校验确认密码
     var validatePassConfirm = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
-      } else if (value !== this.registerForm.password) {
+      } else if (value !== this.passwordForm.newPassword) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -232,28 +245,30 @@ export default {
       avatarUrl:"",
 	  infoModifyFormVisible: false,
 	  modifying:false,
-	  modifyPasswordFormVisible: false,
-	  modifyPasswordRule: {
-        username: [
+    passwordFormVisible: false,
+    passwordForm:{oldPassword: "",newPassword: "",passwordConfirm: ""},
+	  modifyPasswordRule:{
+        oldPassword: [
           {
             required: true,
-            message: "请输入账号",
+            message: "请输入旧密码",
             trigger: "blur"
           }
-          //{ validator: validaeUsername }
         ],
-        password: [
+        newPassword: [
           {
-            required: true,
-            message: "请输入密码",
-            trigger: "blur"
+            trigger: "blur",
+            validator:passPatternValid
           }
-          //{ validator: validaePass2 }
+        ],
+        passwordConfirm: [
+          {
+            trigger: "blur",
+            validator:validatePassConfirm
+          }
         ]
       },
-      oldPassword: "",
-      newPassword: "",
-      passwordConfirm: "",
+
       form: {
         name: "",
         region: "",
@@ -287,22 +302,41 @@ export default {
 
     //修改个人信息
     infoModifySubmit(){
-      let params={id:this.sysUserId,nickName:this.sysNickName,avatarUrl:this.avatarUrl};
-      http.put('/v1/user',params).then((res)=>{
-        console.log(res);
-        if(res.status == 'OK'){
-          this.$message.success('修改个人信息成功！');
-          this.infoModifyFormVisible = false;
-        }else{
-          this.$message.success('修改个人信息错误！请联系管理员');
-        }
-      })
+        this.$refs.passwordForm.validate(valid=>{
+          let params={id:this.sysUserId,nickName:this.sysNickName,avatarUrl:this.avatarUrl};
+          http.put('/v1/user',params).then((res)=>{
+            console.log(res);
+            if(res.status == 'OK'){
+              this.$message.success('修改个人信息成功！');
+              this.infoModifyFormVisible = false;
+            }else{
+              this.$message.success('修改个人信息错误！请联系管理员');
+            }
+          }).catch(error=>{
+            console.log(error);
+             this.$message.error("服务器出错")
+          })
+        })
     },
 
     //打开修改密码模块框
     showPasswordModifyForm() {
-		console.log('打开修改密码');
-      	this.modifyPasswordFormVisible = true;
+      	this.passwordFormVisible = true;
+    },
+    //提交修改密码
+    modifyPasswordSubmit(){
+      let params = {username:this.sysUserName,oldPassword:this.oldPassword,newPassword:this.newPassword};
+      http.post('/v1/updatePassword',params).then(res=>{
+        console.log(res);
+        if(res.status == 'OK'){
+          this.$message.success("密码修改成功！")
+        }else{
+          this.$message.error("密码修改失败！")
+        }
+      }).catch(error=>{
+        console.log(error);
+         this.$message.error("服务器出错")
+      })
     },
     
     //上传照片前
@@ -342,8 +376,7 @@ export default {
         .then(() => {
           sessionStorage.removeItem("user");
           _this.$router.push("/login");
-        })
-        .catch(() => {});
+        }).catch(() => {});
     },
     //折叠导航栏
     collapse: function() {

@@ -1,4 +1,4 @@
-<template slot-scope>
+<template>
 	<section>
 		<div class="main-cons">
 			<div class="div-photo" v-for="item of dogList">

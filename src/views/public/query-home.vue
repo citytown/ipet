@@ -1,4 +1,4 @@
-<template slot-scope>
+<template>
 	<section>
 		<el-form :model="queryForm" label-position="center" label-width="70px">
 			<el-row :gutter="20">
@@ -12,7 +12,7 @@
 						<el-input v-model="queryForm.original"></el-input>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="活动区域">
 						<el-select v-model="queryForm.shape" placeholder="体型">
 							<el-option label="小型" value="小型"></el-option>
@@ -22,7 +22,7 @@
 						</el-select>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="毛长">
 						<el-select v-model="queryForm.woolLength" placeholder="毛长">
 							<el-option label="短毛" value="短毛"></el-option>
@@ -30,7 +30,7 @@
 						</el-select>
 					</el-form-item>
 				</el-col>
-				<el-col :span="3">
+				<el-col :span="5">
 					<el-form-item label="功能">
 						<el-select v-model="queryForm.function"  placeholder="功能">
 							<el-option label="工作犬" value="工作犬"></el-option>

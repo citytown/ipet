@@ -2,17 +2,22 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 
+//无权限页面
+import NonePrivileged from   './views/non-privileged.vue'
+
 //公共模块
 import PublicHome from   './views/public/query-home.vue'
 import PublicDetail from   './views/public/query-detail.vue'
 import Collection from   './views/public/collection.vue'
 import Game from   './views/public/public-game.vue'
+import Advice from   './views/public/advice.vue'
 //管理员模块
 import UserList from   './views/admin/user/list.vue'
 import DogAddPage from './views/admin/dog/dog-add.vue';
 import DogEditPage from './views/admin/dog/dog-edit.vue';
 import DogListPage from './views/admin/dog/dog-list.vue';
 import AdminGame from './views/admin/game/game.vue';
+
 
 let routes = [
 
@@ -97,9 +102,20 @@ let routes = [
         leaf: true,//只有一个节点
         children: [
             { path: '/game/list', component: AdminGame, name: '游戏管理' },
+            {path: '/non-privileged',component: NonePrivileged,name: '无权限页面',hidden:true},
         ]
     },
-
+    {
+        path: '/',
+        component: Home,
+        name: '',
+        iconCls: 'fa fa-address-card',
+        leaf: true,//只有一个节点
+        children: [
+            { path: '/public/advice', component: Advice, name: '意见与反馈' },
+        ]
+    },
+   
     {
         path: '*',
         hidden: true,
