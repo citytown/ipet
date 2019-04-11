@@ -7,12 +7,13 @@
 							<img class="avatar" :src="item.avatarUrl">
 						</el-row>
 						<el-row>
-							<div class="name">{{item.nickName}}</div>
+							<div class="name">昵称：{{item.nickName}}</div>
 						</el-row>
 					</el-col >
 					<el-col :span="19">
 						<el-row class="date-txt">{{item.signDate}}</el-row>
 						<el-row class="content-txt">{{item.content}}</el-row>
+						<el-row class="email-txt">邮箱：{{item.email}}</el-row>
 					</el-col>
 				</div>
 		</div>
@@ -47,32 +48,7 @@ import path from "@/common/constants/path.js"
 		  
 		},
 		methods:{
-			//获取用户收藏
-			queryCollections(){
-				console.log("获取我的收藏")
-				this.dogList = [];
-				let url = '/v1/collections/' + this.loginUser.id + "/" + this.pageNum + '/' + this.pageSize;
-				http.get(url).then((res)=>{
-					console.log(res);
-					if(res.status == 'OK'){
-						for(let item of res.result.rows){
-							item.url = path.API_PATH + item.url;
-							this.dogList.push(item);
-						}
-					}else{
-						this.$message.error("查询错误");
-					}
-				}).catch(error=>{
-					console.error(error);
-					this.$message.error('服务器出错，请联系管理员！');
-      			})
-			},
-			queryDogInfo(dogId){
-				this.$router.push({
-					path:'/public/detail',
-					query:{id:dogId}
-				})
-			},
+
 		}
 	}
 
@@ -111,6 +87,11 @@ import path from "@/common/constants/path.js"
 	.content-txt{
 		padding-top: 15px;
 		font-size: 17px;
+	}
+	.email-txt{
+		padding-left: 950px;
+		margin-top:130px;
+    	font-size: 17px;
 	}
 
 </style>
