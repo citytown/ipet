@@ -1,21 +1,22 @@
 <template >
 	<section>
 		<div class="main-cons">
-				<div v-for="item in adviceList" :key="item.id" class="box">
-					<el-col :span="5">
-						<el-row>
-							<img class="avatar" :src="item.avatarUrl">
-						</el-row>
-						<el-row>
-							<div class="name">{{item.nickName}}</div>
-						</el-row>
-					</el-col >
-					<el-col :span="19">
-						<el-row class="date-txt">{{item.signDate}}</el-row>
-						<el-row class="content-txt">{{item.content}}</el-row>
-					</el-col>
-				</div>
+			<div v-for="item in adviceList" :key="item.id" class="box">
+				<el-col :span="5">
+					<el-row>
+						<img class="avatar" :src="item.avatarUrl">
+					</el-row>
+					<el-row>
+						<div class="name">{{item.nickName}}</div>
+					</el-row>
+				</el-col >
+				<el-col :span="19">
+					<el-row class="date-txt">{{item.signDate}}</el-row>
+					<el-row class="content-txt">{{item.content}}</el-row>
+				</el-col>
+			</div>
 		</div>
+
 	</section>
 </template>
 
@@ -32,8 +33,9 @@ import path from "@/common/constants/path.js"
 		},
 		data() {
 			return {
-				pageNum:1,
+				page:1,
 				pageSize:0,//如果每页大小是0的话，则返回全部
+				total:0,
 				adviceList:[{id:'1',userId:'1',nickName:'苏大强',avatarUrl:'http://www.xinhuanet.com/politics/2019-04/02/1124313587_15541622213671n.jpg',content:'我不吃，我不喝，我就要钱，给我钱！',email:'sudaqiang@163.com',signDate:'2019-04-04 11:00:00'},
 				{id:'1',userId:'1',nickName:'苏大强',avatarUrl:'http://www.xinhuanet.com/politics/2019-04/02/1124313587_15541622213671n.jpg',content:'我不吃，我不喝，我就要钱，给我钱！',email:'sudaqiang@163.com',signDate:'2019-04-04 11:00:00'},
 				{id:'1',userId:'1',nickName:'苏大强',avatarUrl:'http://www.xinhuanet.com/politics/2019-04/02/1124313587_15541622213671n.jpg',content:'我不吃，我不喝，我就要钱，给我钱！',email:'sudaqiang@163.com',signDate:'2019-04-04 11:00:00'},
@@ -47,31 +49,8 @@ import path from "@/common/constants/path.js"
 		  
 		},
 		methods:{
-			//获取用户收藏
-			queryCollections(){
-				console.log("获取我的收藏")
-				this.dogList = [];
-				let url = '/v1/collections/' + this.loginUser.id + "/" + this.pageNum + '/' + this.pageSize;
-				http.get(url).then((res)=>{
-					console.log(res);
-					if(res.status == 'OK'){
-						for(let item of res.result.rows){
-							item.url = path.API_PATH + item.url;
-							this.dogList.push(item);
-						}
-					}else{
-						this.$message.error("查询错误");
-					}
-				}).catch(error=>{
-					console.error(error);
-					this.$message.error('服务器出错，请联系管理员！');
-      			})
-			},
-			queryDogInfo(dogId){
-				this.$router.push({
-					path:'/public/detail',
-					query:{id:dogId}
-				})
+			handleCurrentChange(val) {
+				this.page = val;
 			},
 		}
 	}

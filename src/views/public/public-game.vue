@@ -1,19 +1,19 @@
 <template>
 	<section>
 		<el-row>
-			<el-col :offset="8">
+			<el-col :offset="7" :span="6" style="text-align:center">
 				<img :src="imgUrl==''?defaultPhotoUrl:imgUrl" class="img">
 			</el-col>
 		</el-row>
-		<el-row class="title">
-			<el-col :offset="7" >题目：{{game.content}}</el-col>
+		<el-row >
+			<el-col :offset="7" :span="6" class="gameTitle">题目：{{game.content}}</el-col>
 		</el-row>
 		<el-row class="choice">
-			<el-col :span="3" :offset="7"> <el-radio v-model="mychoice"  border size="medium" label="1">&nbsp;{{game.choiceOne}}</el-radio></el-col>
+			<el-col :span="4" :offset="6"> <el-radio v-model="mychoice"  border size="medium" label="1">&nbsp;{{game.choiceOne}}</el-radio></el-col>
 			<el-col :span="3" :offset="1"> <el-radio v-model="mychoice"  border size="medium" label="2">&nbsp;{{game.choiceTwo}}</el-radio></el-col>
 		</el-row>
 		<el-row class="choice">
-			<el-col :span="3" :offset="7"><el-radio v-model="mychoice"  border size="medium" label="3">&nbsp;{{game.choiceThree}}</el-radio></el-col>
+			<el-col :span="4" :offset="6"><el-radio v-model="mychoice"  border size="medium" label="3">&nbsp;{{game.choiceThree}}</el-radio></el-col>
 			<el-col :span="3" :offset="1"><el-radio v-model="mychoice"  border size="medium" label="4">&nbsp;{{game.choiceFour}}</el-radio></el-col>
 		</el-row>
 		<el-row class="choice">
@@ -26,11 +26,11 @@
 				 <img class="judge" src="../../assets/correct.png"  v-if="judge">
 				 <img class="judge" src="../../assets/wrong.png"  v-if="!judge">
 			</el-col>
-			<el-col :span="3" class="tip">
+			<el-col :span="2" class="tip">
 			    <label v-if="judge">恭喜你，正确！</label>
-				<label v-if="!judge">回答错误，请重新选择！</label>
+				<label v-if="!judge">正确选项是：{{rightLabel}}</label>
 			</el-col>
-			<el-col :span="3" :offset="3" class="tip">
+			<el-col :span="2" :offset="3" class="tip">
 				<el-button type="primary" @click="nextGame()" v-if="!canChoose">下一题</el-button>
 			</el-col>
 		</el-row>
@@ -57,6 +57,7 @@ import path from "@/common/constants/path.js"
 				judge:false,
 				showJudge:false,
 				canChoose:true,
+				rightLabel:'',//正确选项名称
 			}
 		  
 		},
@@ -64,10 +65,18 @@ import path from "@/common/constants/path.js"
 			//获取用户收藏
 			getRandomGame(){
 				http.get('/v1/randomGame').then((res)=>{
-					console.log(res);
 					if(res.status == 'OK'){
 						this.game = res.result;
 						this.imgUrl = path.API_PATH + this.game.photoUrl;
+						if(this.game.rightChoice == 1){
+							this.rightLabel = this.game.choiceOne;
+						}else if(this.game.rightChoice == 2){
+							this.rightLabel = this.game.choiceTwo;
+						}else if(this.game.rightChoice == 3){
+							this.rightLabel = this.game.choiceThree;
+						}else if(this.game.rightChoice == 4){
+							this.rightLabel = this.game.choiceFour;
+						}
 					}else{
 						this.$message.error("查询错误");
 					}
@@ -78,17 +87,16 @@ import path from "@/common/constants/path.js"
 			},
 			//选择选项
 			selectedChoice(){
-				console.log('我的选择：' + this.mychoice);
 				if(this.mychoice == ''){
 					this.$message.warning("请先选择一个选项");
 					return;
 				}else{
 					if(this.mychoice == this.game.rightChoice){
 						this.judge = true;
-						this.canChoose = false;
 					}else{
 						this.judge = false;
 					}
+					this.canChoose = false;
 					this.showJudge = true;
 				}
 			},
@@ -107,16 +115,20 @@ import path from "@/common/constants/path.js"
 
 <style>
 .img{
+	min-width: 400px;
+	min-height: 400px;
 	max-width: 400px;
 	max-height: 400px;
 	object-fit: cover;
 }
-.title{
+.gameTitle{
 	margin-top:20px;
 	font-size: 20px;
+	text-align:center;
 }
 .choice{
 	margin-top:20px;
+	text-align: center;
 }
 .judge{
 	width: 150px;

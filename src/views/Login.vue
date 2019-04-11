@@ -215,10 +215,14 @@ export default {
               console.log(res.status);
               this.logining = false;
               if (res.status == "OK") {
-                sessionStorage.setItem("user", JSON.stringify(res.result));
-                this.$router.push({
-                  path: "/public/home"
-                });
+                if(res.result){
+                  sessionStorage.setItem("user", JSON.stringify(res.result));
+                  this.$router.push({
+                    path: "/public/home"
+                  });
+                }else{
+                  this.$message.error("登录失败！联系管理员")
+                }
               }else{
                 this.$message.error(res.result);
               }

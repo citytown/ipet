@@ -124,7 +124,7 @@ export default {
 	data() {
 		//校验确认密码
 		var rightChoiceVali = (rule, value, callback) => {
-			if (value != '1' || alue != '2'|| alue != '3'|| alue != '4') {
+			if (value != '1' && value != '2'&& value != '3'&& value != '4') {
 				callback(new Error("只能填写1,2,3,4四个数字"));
 			}else {
 				callback();
