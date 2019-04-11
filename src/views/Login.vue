@@ -1,12 +1,14 @@
-<template slot-scope="slot-scope">
+<template >
   <section>
+    <div class='bg-container'>
+      <div>&nbsp;</div>
     <el-form
       :model="loginForm"
       :rules="loginRule"
       ref="loginForm"
       label-position="left"
       label-width="0px"
-      class="demo-ruleForm login-container"
+      class="login-container"
     >
       <h3 class="title">系统登录</h3>
       <el-form-item prop="username">
@@ -25,10 +27,8 @@
           @click.native.prevent="loginSubmit"
           :loading="logining"
         >登录</el-button>
-        <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
       </el-form-item>
     </el-form>
-
     <!--注册界面对话框-->
     <el-dialog
       title="用户注册"
@@ -89,6 +89,7 @@
         <el-button type="primary" @click.native="registerSubmit" :loading="registing">提交</el-button>
       </div>
     </el-dialog>
+    </div>
   </section>
 </template>
 
@@ -203,12 +204,12 @@ export default {
     //用户登录
     loginSubmit() {
       this.$refs.loginForm.validate(valid => {
+        this.logining = true;
         if (valid) {
           var loginParam = {
             username: this.loginForm.username,
             password: this.loginForm.password
           };   
-          this.logining = true;
           http
             .post("/v1/login", loginParam)
             .then(res => {
@@ -232,7 +233,7 @@ export default {
               var content = "服務器異常，連接碼： " + error.response.status;
               this.$alert(content, "警告", {});
             });
-           
+           this.logining = false;
         } else {
           console.log("error submit!!");
           return false;
@@ -301,7 +302,6 @@ export default {
                   type: "success"
                 });
               }
-              this.registering = false;
               this.registerFormVisible = false;
             })
             .catch(error => {
@@ -309,6 +309,7 @@ export default {
               var content = "服務器異常，連接碼： " + error.response.status;
               this.$alert(content, "警告", {});
             }); 
+            this.registering = false;
         } else {
           console.log("error submit!!");
           return false;
@@ -319,9 +320,13 @@ export default {
 };
 </script>
 
-<style lang="scss" slot-scope>
+<style lang="scss">
+.bg-container{
+  background: url('~@/assets/background.jpg');
+  width: 100%;
+  height: 1000px;
+}
 .login-container {
-  /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
   -webkit-border-radius: 5px;
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -332,7 +337,7 @@ export default {
   background: #fff;
   border: 1px solid #eaeaea;
   box-shadow: 0 0 25px #cac6c6;
-
+}
   .title {
     margin: 0px auto 40px auto;
     text-align: center;
@@ -349,5 +354,4 @@ export default {
     width: 178px;
     height: 178px;
   }
-}
 </style>

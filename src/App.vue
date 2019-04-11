@@ -1,5 +1,5 @@
 <template>
-	<div id="app">
+	<div id="app" class='back'>
 		<transition name="fade" mode="out-in">
 			<router-view></router-view>
 		</transition>
@@ -16,11 +16,18 @@ export default {
 </script>
 
 <style lang="scss" slot-scope>
+/* .back{
+  background: url('~@/assets/background2.jpg');
+  background-repeat: no-repeat;
+  background-size:cover;
+  width: 100%;
+  height: 100%;
+} */
 body {
 	margin: 0px;
 	padding: 0px;
-	/*background: url(assets/bg1.jpg) center !important;
-		background-size: cover;*/
+/* 	background: url(assets/background2.jpg) center !important;
+		background-size: cover; */
 	// background: #1F2D3D;
 	font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
 	font-size: 14px;
