@@ -1,20 +1,22 @@
 <template >
 	<section>
 		<div class="main-cons">
-			<div v-for="item in adviceList" :key="item.id" class="box">
-				<el-col :span="5">
-					<el-row>
-						<img class="avatar" :src="item.avatarUrl">
-					</el-row>
-					<el-row>
-						<div class="name">{{item.nickName}}</div>
-					</el-row>
-				</el-col >
-				<el-col :span="19">
-					<el-row class="date-txt">{{item.signDate}}</el-row>
-					<el-row class="content-txt">{{item.content}}</el-row>
-				</el-col>
-			</div>
+
+				<div v-for="item in adviceList" :key="item.id" class="box">
+					<el-col :span="5">
+						<el-row>
+							<img class="avatar" :src="item.avatarUrl">
+						</el-row>
+						<el-row>
+							<div class="name">昵称：{{item.nickName}}</div>
+						</el-row>
+					</el-col >
+					<el-col :span="19">
+						<el-row class="date-txt">{{item.signDate}}</el-row>
+						<el-row class="content-txt">{{item.content}}</el-row>
+						<el-row class="email-txt">邮箱：{{item.email}}</el-row>
+					</el-col>
+				</div>
 		</div>
 
 	</section>
@@ -52,6 +54,7 @@ import path from "@/common/constants/path.js"
 			handleCurrentChange(val) {
 				this.page = val;
 			},
+
 		}
 	}
 
@@ -90,6 +93,11 @@ import path from "@/common/constants/path.js"
 	.content-txt{
 		padding-top: 15px;
 		font-size: 17px;
+	}
+	.email-txt{
+		padding-left: 950px;
+		margin-top:130px;
+    	font-size: 17px;
 	}
 
 </style>
