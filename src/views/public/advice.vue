@@ -4,25 +4,32 @@
 			<el-col :offset="20"><el-button type="primary" @click="showForm()">提出建议</el-button></el-col>
 		</el-row>
 		<div class="main-cons">
-				<div v-for="item in adviceList" :key="item.id" class="box">
-					<el-col :span="5">
-						<el-row>
-							<img class="avatar" :src="item.avatarUrl">
-						</el-row>
-						<el-row>
-							<div class="name">昵称：{{item.nickName}}</div>
-						</el-row>
-					</el-col >
-					<el-col :span="19">
-						<el-row class="date-txt">{{item.signDate}}</el-row>
-						<el-row >
-							<div class="content-txt">{{item.content}}</div>
-						</el-row>
-						<el-row v-if="loginUser.roleId == 1">
-							<div class="email-txt">邮箱：{{item.email}}</div>
-						</el-row>
-					</el-col>
-				</div>
+			<el-row v-for="item in adviceList" :key="item.id">
+				<el-col :offset="1" :span="21">
+					<div class="box">
+						<el-col :span="4" style="text-align:center">
+							<el-row>
+								<img class="avatar" :src="item.avatarUrl">
+							</el-row>
+							<el-row>
+								<div class="name">昵称：{{item.nickName}}</div>
+							</el-row>
+						</el-col >
+						<el-col :span="19">
+							<el-row >
+								<el-col class="date-txt" :offset="20">{{item.signDate}}</el-col>
+							</el-row>
+							<el-row >
+								<div class="content-txt">{{item.content}}</div>
+							</el-row>
+							<el-row v-if="loginUser.roleId == 1">
+								<el-col :span='1' :offset="16" class='del-btn'><el-button type="danger" @click="delSubmit(item.id)">删除</el-button></el-col>
+								<el-col :span='6' :offset="1" ><div class="email-txt">邮箱：{{item.email}}</div></el-col>
+							</el-row>
+						</el-col>
+					</div>
+				</el-col>
+			</el-row>
 		</div>
     <!--注册界面对话框-->
     <el-dialog
@@ -62,7 +69,6 @@ import path from "@/common/constants/path.js"
 	export default {
 		mounted(){
 			this.loginUser = JSON.parse(sessionStorage.getItem("user"));
-			console.log('当前登录用户：'+ sessionStorage.getItem("user"))
 			if(this.loginUser){
 				this.adviceForm.userId = this.loginUser.id;
 				this.getAdviceList();
@@ -88,6 +94,7 @@ import path from "@/common/constants/path.js"
 					email: [
 						{
 							type: 'email', 
+							required: true,
 							message: '请输入正确的邮箱地址', 
 							trigger: ['blur', 'change'] 
 						}
@@ -102,7 +109,10 @@ import path from "@/common/constants/path.js"
 			getAdviceList(){
 				http.get("/v1/advices/"+this.page + "/" + this.pageSize).then(res=>{
 					if(res.status == 'OK'){
-						this.adviceList = res.result.rows;
+						this.adviceList = res.result.rows.map(item=>{
+							item.avatarUrl = path.API_PATH + item.avatarUrl;
+							return item;
+						});
 						this.total = res.result.total;
 					}
 				}).catch(err=>{
@@ -143,6 +153,26 @@ import path from "@/common/constants/path.js"
           				return false;
 					}
 				})
+			},
+			delSubmit(id){
+				console.log('id is:'+id);
+				this.$confirm('确认删除该记录吗?', '提示', {
+					type: 'warning'
+				}).then(() => {
+					http.del('/v1/advice',{id:id}).then((res) => {
+            if (res.status == "OK") {
+              this.$message({
+                message: "删除成功！",
+                 type: "success"
+              });
+							this.getAdviceList();
+            }else{
+							this.$message.error("删除失败!");
+						}
+					});
+				}).catch((error) => {
+					console.log(error);
+				});
 			}
 
 		}
@@ -155,7 +185,6 @@ import path from "@/common/constants/path.js"
 		padding: 20px 0;
 	}
 	.box{
-		width: 1500px;
     	height: 250px;
     	border-radius: 4px;
     	margin-left: 30px;
@@ -172,11 +201,10 @@ import path from "@/common/constants/path.js"
 	}
 	.name{
 		font-size: 15px;
-    	margin-left: 70px;
+    	margin-left: 15px;
     	margin-top: 10px;
 	}
 	.date-txt{
-		padding-left: 1000px;
 		padding-top: 20px;
     	font-size: 17px;
 	}
@@ -185,10 +213,12 @@ import path from "@/common/constants/path.js"
 		font-size: 17px;
 		position: absolute;
 	}
+	.del-btn{
+		margin-top:150px;
+	}
 	.email-txt{
-		padding-left: 950px;
 		margin-top:170px;
-    	font-size: 17px;
+    font-size: 17px;
 	}
 
 </style>

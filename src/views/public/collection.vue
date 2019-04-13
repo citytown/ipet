@@ -15,7 +15,6 @@ import path from "@/common/constants/path.js"
 	export default {
 		mounted(){
 			this.loginUser = JSON.parse(sessionStorage.getItem("user"));
-			console.log('当前登录用户：'+ this.loginUser)
 			if(this.loginUser){
 				this.queryCollections();
 			}

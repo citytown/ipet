@@ -258,26 +258,17 @@ export default {
         newPassword: [
           {
             trigger: "blur",
+            required: true,
             validator:passPatternValid
           }
         ],
         passwordConfirm: [
           {
             trigger: "blur",
+            required: true,
             validator:validatePassConfirm
           }
         ]
-      },
-
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: ""
       },
       uploadUrl:'',//头像上传地址
     };
@@ -302,21 +293,20 @@ export default {
 
     //修改个人信息
     infoModifySubmit(){
-        this.$refs.passwordForm.validate(valid=>{
+        console.log('xiugai');
           let params={id:this.sysUserId,nickName:this.sysNickName,avatarUrl:this.avatarUrl};
-          http.put('/v1/user',params).then((res)=>{
-            console.log(res);
-            if(res.status == 'OK'){
-              this.$message.success('修改个人信息成功！');
-              this.infoModifyFormVisible = false;
-            }else{
-              this.$message.success('修改个人信息错误！请联系管理员');
-            }
-          }).catch(error=>{
-            console.log(error);
-             this.$message.error("服务器出错")
-          })
-        })
+            http.put('/v1/user',params).then((res)=>{
+              console.log(res);
+              if(res.status == 'OK'){
+                this.$message.success('修改个人信息成功！');
+                this.infoModifyFormVisible = false;
+              }else{
+                this.$message.success('修改个人信息错误！请联系管理员');
+              }
+            }).catch(error=>{
+              console.log(error);
+              this.$message.error("服务器出错")
+            })
     },
 
     //打开修改密码模块框
@@ -325,7 +315,7 @@ export default {
     },
     //提交修改密码
     modifyPasswordSubmit(){
-      let params = {username:this.sysUserName,oldPassword:this.oldPassword,newPassword:this.newPassword};
+      let params = {username:this.sysUserName,oldPassword:this.passwordForm.oldPassword,newPassword:this.passwordForm.newPassword};
       http.post('/v1/updatePassword',params).then(res=>{
         console.log(res);
         if(res.status == 'OK'){
@@ -360,7 +350,6 @@ export default {
         this.avatarUrl = res.result[0].url;
         //this.imgUrl = URL.createObjectURL(file.raw);
         this.sysUserAvatar = path.API_PATH + res.result[0].url;
-        console.log(this.imgUrl);
         this.$message.success('上传头像成功！');
       }else{
         console.log(res);

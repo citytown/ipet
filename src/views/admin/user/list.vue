@@ -53,9 +53,9 @@
       title="用户注册"
       :visible.sync="addFormVisible"
       :close-on-click-modal="false"
-      width="35%"
+      width="42%"
     >
-      <el-form label-width="70px" :rules="addFormRules" ref="addForm" :model="addForm">
+      <el-form label-width="80px" :rules="addFormRules" ref="addForm" :model="addForm">
         <el-col :span="12">
           <el-row>
             <el-form-item label="用户名" prop="username">
@@ -177,18 +177,21 @@ import path from "@/common/constants/path.js"
 					username: [
 						{
 							validator: validateUsername,
+							required: true,
 							trigger: "blur"
 						}
 					],
 					password: [
 						{
 							validator: passPatternValid,
+							required: true,
 							trigger: "blur"
 						}
 					],
 					passwordConfirm: [
 						{
 							validator: validatePassConfirm,
+							required: true,
 							trigger: "blur"
 						}
 					],

@@ -34,9 +34,9 @@
       title="用户注册"
       :visible.sync="registerFormVisible"
       :close-on-click-modal="false"
-      width="40%"
+      width="42%"
     >
-      <el-form label-width="70px" :rules="registerRule" ref="registerForm" :model="registerForm">
+      <el-form label-width="80px" :rules="registerRule" ref="registerForm" :model="registerForm">
         <el-col :span="12">
           <el-row>
             <el-form-item label="用户名" prop="username">
@@ -124,8 +124,8 @@ export default {
     //校验密码格式 
     var passPatternValid = (rule, value, callback) => {
       var pattern = /^[a-zA-Z0-9_]{1,}$/; 
-      if (value.length < 3) {
-        callback(new Error("密码长度不能小于3位"));
+      if (value.length < 3 || value.length > 16) {
+        callback(new Error("密码长度不能小于3位并且不能大于16位"));
       } else if (!value.match(pattern)) {
         callback(new Error("密码只能包含数字，字母大小写和下划线"));
       } else {
@@ -167,18 +167,21 @@ export default {
       registerRule: {
         username: [
           {
+            required: true,
             validator: validaeUsername,
             trigger: "blur"
           }
         ],
         password: [
           {
+            required: true,
             validator: passPatternValid,
             trigger: "blur"
           }
         ],
         passwordConfirm: [
           {
+            required: true,
             validator: validatePassConfirm,
             trigger: "blur"
           }

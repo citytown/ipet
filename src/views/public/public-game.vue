@@ -26,7 +26,7 @@
 				 <img class="judge" src="../../assets/correct.png"  v-if="judge">
 				 <img class="judge" src="../../assets/wrong.png"  v-if="!judge">
 			</el-col>
-			<el-col :span="2" class="tip">
+			<el-col :span="4" class="tip">
 			    <label v-if="judge">恭喜你，正确！</label>
 				<label v-if="!judge">正确选项是：{{rightLabel}}</label>
 			</el-col>
@@ -43,7 +43,6 @@ import path from "@/common/constants/path.js"
 	export default {
 		mounted(){
 			this.loginUser = JSON.parse(sessionStorage.getItem("user"));
-			console.log('当前登录用户：'+ this.loginUser)
 			if(this.loginUser){
 				this.getRandomGame();
 			}
@@ -115,10 +114,10 @@ import path from "@/common/constants/path.js"
 
 <style>
 .img{
-	min-width: 400px;
-	min-height: 400px;
-	max-width: 400px;
-	max-height: 400px;
+	min-width: 250px;
+	min-height: 250px;
+	max-width: 250px;
+	max-height: 250px;
 	object-fit: cover;
 }
 .gameTitle{
@@ -137,6 +136,6 @@ import path from "@/common/constants/path.js"
 .tip{
 	margin-top:100px;
 	font-size:15px;
-	margin-left:20px;
+	margin-left:40px;
 	}
 </style>

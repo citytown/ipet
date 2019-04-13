@@ -2,7 +2,7 @@
   <section>
     <div class="mycontainer">
       <el-row>
-        <el-col :span="12">
+        <el-col :span="14">
           <el-row>
             <div class="breed">
               {{dog.breed}}
@@ -19,8 +19,8 @@
             <el-col :span="10">
               <div class="dog-text">原产地：{{dog.original}}</div>
             </el-col>
-            <el-col :span="10">
-              <div class="dog-text">体型：{{dog.shape}}</div>
+            <el-col :span="14">
+              <div class="dog-text">体型大小：{{dog.shape}}</div>
             </el-col>
           </el-row>
           <el-row>
@@ -42,18 +42,18 @@
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="5">
+        <el-col :span="8">
             <img class="avatar" :src= "avatarUrl">
         </el-col>
       </el-row>
-      <div class="dog-text">简介：</div>
+      <div class="dog-descri">简介：</div>
       <el-row>
         <el-col :span="20">
           <div class="descri">{{dog.description}}</div>
         </el-col>
       </el-row>
       <el-row>
-        <div class="dog-text">相册：</div>
+        <div class="dog-descri">相册：</div>
       </el-row>
       <el-row>
         <el-col :span="20">
@@ -86,7 +86,6 @@ import path from "@/common/constants/path.js"
     //初始化
     mounted() {
       this.loginUser = JSON.parse(sessionStorage.getItem("user"));
-      console.log('当前登录用户：'+ this.loginUser)
       if(this.$route.query.id == undefined){
         this.$router.push({
           path:'/public/home'
@@ -198,10 +197,18 @@ import path from "@/common/constants/path.js"
 .dog-text{
   font-size: 25px;
   padding-top: 40px;
+  border-bottom: 2px dashed;
+  border-color: #b7b3b3;
+}
+.dog-descri{
+  font-size: 25px;
+  padding-top: 40px;
+  border-bottom: 2px solid;
+  border-color: #b7b3b3;
 }
 .avatar{
-  width:250px;
-  height: 250px;
+  width:200px;
+  height: 200px;
   margin-top: 30px;
   border-radius: 20px;
   margin-left: 20px;

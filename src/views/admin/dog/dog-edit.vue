@@ -172,7 +172,6 @@ import path from "@/common/constants/path.js"
 				path:'/dog/list'
 			})
 		}else{
-			console.log('狗 id：'+ this.$route.query.id);
 			this.form.id = this.$route.query.id;
 			this.uploadAvatarUrl="/v1/file/upload/dogAvatar/" + this.form.id;
 			this.uploadPhotosUrl="/v1/file/upload/dogPhotos/" + this.form.id;

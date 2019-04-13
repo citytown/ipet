@@ -13,7 +13,7 @@
 					</el-form-item>
 				</el-col>
 				<el-col :span="5">
-					<el-form-item label="活动区域">
+					<el-form-item label="体型">
 						<el-select v-model="queryForm.shape" placeholder="体型">
 							<el-option label="小型" value="小型"></el-option>
 							<el-option label="中型" value="中型"></el-option>
@@ -96,7 +96,6 @@ import path from "@/common/constants/path.js"
 	export default {
 		mounted(){
 			 var user = sessionStorage.getItem("user");
-			  console.log('当前登录用户：'+user)
 			this.queryDog();
 		},
 		data() {
