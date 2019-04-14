@@ -49,7 +49,7 @@
       <div class="dog-descri">简介：</div>
       <el-row>
         <el-col :span="20">
-          <div class="descri">{{dog.description}}</div>
+          <div class="descri" v-html="dog.description"></div>
         </el-col>
       </el-row>
       <el-row>
@@ -81,6 +81,7 @@
 import http from '@/api/http.js';
 import collection from '@/assets/collection.png'
 import path from "@/common/constants/path.js"
+import util from '@/common/js/util.js'
 
   export default {
     //初始化
@@ -101,8 +102,8 @@ import path from "@/common/constants/path.js"
       return{
         loginUser:{},
         dog:{id:'',breed:'',original:'',shape:'',woolength:'',minLife:'',maxLife:'',minPrice:'',maxPrice:"",descrition:""},
-        defaultPhotoUrl: path.API_PATH + 'image/default/default.jpg',//默认照片
-        avatarUrl:path.API_PATH + 'image/default/default.jpg',//默认照片,
+        defaultPhotoUrl: path.API_PATH + 'image/default/default-dog.jpg',//默认照片
+        avatarUrl:path.API_PATH + 'image/default/default-dog.jpg',//默认照片,
         photos:[],
         remark:{id:'',dogId:'',userId:'',collect:0,content:''},
         remarkVisible:false
@@ -114,7 +115,9 @@ import path from "@/common/constants/path.js"
 			http.get('/v1/dog/'+this.dog.id).then(res=>{
 				if(res.status == 'OK'){
           console.log(res)
-					this.dog = res.result.dogInfo;
+          this.dog = res.result.dogInfo;
+          console.log(this.dog.description);
+          this.dog.description = util.replaceTextarea1(this.dog.description);
 					this.funcSelected = this.dog.function.split(",");
 					let photos = res.result.photos;
 					if(photos !=''){

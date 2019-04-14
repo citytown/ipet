@@ -33,7 +33,7 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
 			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -136,6 +136,7 @@ export default {
 			content: "",
 			total: 0,
 			page: 1,
+			pageSize:20,
 			listLoading: false,
 			sels: [], //列表选中列
 			formVisible: false, //新增编辑界面是否显示
@@ -208,14 +209,14 @@ export default {
 			if (this.content == '') {
 				this.getGames();
 			} else {
-				http.get('/v1/likeContent/' + this.content).then((res) => {
+				http.get('/v1/game/likeContent/'+this.page+'/'+this.pageSize + '/' + this.content).then((res) => {
 					console.log(res);
 					if (res.status == 'OK') {
-						this.total = res.result.length;
-						this.games = res.result;
+						this.total = res.result.total;
+						this.games = res.result.rows;
 						this.listLoading = false;
 					} else {
-						this.$message.error("查询用户失败!");
+						this.$message.error("查询失败!");
 					}
 				}).catch(err => {
 					console.log(err);

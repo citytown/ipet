@@ -21,7 +21,7 @@
 						</el-col>
 					</el-row >
 					<el-row>
-						<el-col :span="5">
+						<el-col :span="6">
 							<el-form-item label="活动区域">
 								<el-select v-model="form.shape" placeholder="体型">
 									<el-option label="小型" value="小型"></el-option>
@@ -31,7 +31,7 @@
 								</el-select>
 							</el-form-item>
 						</el-col>
-						<el-col :span="5">
+						<el-col :span="6">
 							<el-form-item label="毛长">
 								<el-select v-model="form.woolLength" placeholder="毛长">
 									<el-option label="短毛" value="短毛"></el-option>
@@ -57,7 +57,7 @@
 						</el-col>
 					</el-row>
 					<el-row>
-						<el-col :span="9">
+						<el-col :span="10">
 						<el-form-item label="平均寿命">
 							<el-col :span="7">
 									<el-input v-model="form.minLife"></el-input>
@@ -71,7 +71,7 @@
 							<el-col :span="1" :offset="1">年</el-col>
 						</el-form-item>
 						</el-col>
-						<el-col :span="7">
+						<el-col :span="11">
 						<el-form-item label="平均价格">
 							<el-col :span="7" :offset="2">
 									<el-input v-model="form.minPrice"></el-input>
@@ -153,8 +153,8 @@ import path from "@/common/constants/path.js"
 				form:{id:'',breed:'',original:'',shape:'',woolLength:'',function:''},
 				uploadAvatarUrl:'',//上传封面地址
 				uploadPhotosUrl:'',//上传相册地址
-				defaultPhotoUrl: path.API_PATH + 'image/default/default.jpg',//默认照片
-				avatarUrl:path.API_PATH + 'image/default/default.jpg',//默认照片,
+				defaultPhotoUrl: path.API_PATH + 'image/default/default-dog.jpg',//默认照片
+				avatarUrl:path.API_PATH + 'image/default/default-dog.jpg',//默认照片,
 				fileList: [],//狗照片相册列表
 				photoList:[],
 				funcSelected:[],

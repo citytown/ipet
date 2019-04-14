@@ -79,7 +79,7 @@ let routes = [
         name: '犬类管理',
         iconCls: 'el-icon-circle-plus',
         children: [
-            { path: '/dog/list', component: DogListPage, name: '犬类管理主页' },
+            { path: '/dog/list', component: DogListPage, name: '犬类信息的删改' },
             { path: '/dog/add', component: DogAddPage, name: '犬类增加' },
             { path: '/dog/edit', component: DogEditPage, name: '犬类修改' ,hidden: true}
         ]
@@ -112,7 +112,7 @@ let routes = [
         iconCls: 'fa fa-address-card',
         leaf: true,//只有一个节点
         children: [
-            { path: '/public/advice', component: Advice, name: '意见与反馈' },
+            { path: '/public/advice', component: Advice, name: '反馈与建议' },
         ]
     },
    

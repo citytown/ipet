@@ -17,9 +17,14 @@ export default {
         r = null;
         return context == null || context == "" || context == "undefined" ? "" : context;
     },
+    replaceTextarea1(str){
+        var reg=new RegExp("\r\n","g"); 
+        var reg1=new RegExp("\n","g"); 
+        str = str.replace(reg,"<br>"); 
+        str = str.replace(reg1,"<br>"); 
+        return str; 
+    },
     formatDate: {
-
-
         format: function (date, pattern) {
             pattern = pattern || DEFAULT_PATTERN;
             return pattern.replace(SIGN_REGEXP, function ($0) {
@@ -56,6 +61,7 @@ export default {
             return null;
         }
 
-    }
+    },
+
 
 };

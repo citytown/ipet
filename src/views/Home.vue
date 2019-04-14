@@ -2,16 +2,8 @@
   <section>
   <el-row class="container">
     <el-col :span="24" class="header">
-      <el-col
-        :span="10"
-        class="logo"
-        :class="collapsed?'logo-collapse-width':'logo-width'"
-      >{{collapsed?'':sysUserName}}</el-col>
-      <el-col :span="10">
-        <div class="tools" @click.prevent="collapse">
-          <i class="fa fa-align-justify"></i>
-        </div>
-      </el-col>
+      <el-col :span="10" class="logo">犬类查询系统</el-col>
+      <el-col :span="10"></el-col>
       <el-col :span="4" class="userinfo">
         <el-dropdown trigger="hover">
           <span class="el-dropdown-link userinfo-inner">
@@ -27,7 +19,7 @@
       </el-col>
     </el-col>
     <el-col :span="24" class="main">
-      <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
+      <aside class="menu-expanded">
         <!--导航菜单-->
         <el-menu
           :default-active="$route.path"
@@ -37,7 +29,6 @@
           @select="handleselect"
           unique-opened
           router
-          v-show="!collapsed"
         >
           <template v-for="(item,index) in $router.options.routes" v-if="!item.hidden">
             <el-submenu :index="index+''" v-if="!item.leaf">
@@ -58,53 +49,6 @@
             </el-menu-item>
           </template>
         </el-menu>
-        <!--导航菜单-折叠后-->
-        <ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
-          <li
-            v-for="(item,index) in $router.options.routes"
-            v-if="!item.hidden"
-            class="el-submenu item"
-          >
-            <template v-if="!item.leaf">
-              <div
-                class="el-submenu__title"
-                style="padding-left: 20px;"
-                @mouseover="showMenu(index,true)"
-                @mouseout="showMenu(index,false)"
-              >
-                <i :class="item.iconCls"></i>
-              </div>
-              <ul
-                class="el-menu submenu"
-                :class="'submenu-hook-'+index"
-                @mouseover="showMenu(index,true)"
-                @mouseout="showMenu(index,false)"
-              >
-                <li
-                  v-for="child in item.children"
-                  v-if="!child.hidden"
-                  :key="child.path"
-                  class="el-menu-item"
-                  style="padding-left: 40px;"
-                  :class="$route.path==child.path?'is-active':''"
-                  @click="$router.push(child.path)"
-                >{{child.name}}</li>
-              </ul>
-            </template>
-            <template v-else>
-              <li class="el-submenu">
-                <div
-                  class="el-submenu__title el-menu-item"
-                  style="padding-left: 20px;height: 56px;line-height: 56px;padding: 0 20px;"
-                  :class="$route.path==item.children[0].path?'is-active':''"
-                  @click="$router.push(item.children[0].path)"
-                >
-                  <i :class="item.iconCls"></i>
-                </div>
-              </li>
-            </template>
-          </li>
-        </ul>
       </aside>
       <section class="content-container">
         <div class="grid-content bg-purple-light">
@@ -238,6 +182,7 @@ export default {
       }
     };
     return {
+      loginUser:{},
       collapsed: false,
       sysUserName: "",
       sysUserAvatar: "",
@@ -299,6 +244,9 @@ export default {
               console.log(res);
               if(res.status == 'OK'){
                 this.$message.success('修改个人信息成功！');
+                this.loginUser.nickName = this.sysNickName,
+                this.loginUser.avatarUrl = this.avatarUrl;
+                sessionStorage.setItem("user", JSON.stringify(this.loginUser));
                 this.infoModifyFormVisible = false;
               }else{
                 this.$message.success('修改个人信息错误！请联系管理员');
@@ -367,24 +315,17 @@ export default {
           _this.$router.push("/login");
         }).catch(() => {});
     },
-    //折叠导航栏
-    collapse: function() {
-      this.collapsed = !this.collapsed;
-    },
-    showMenu(i, status) {
-      this.$refs.menuCollapsed.getElementsByClassName(
-        "submenu-hook-" + i
-      )[0].style.display = status ? "block" : "none";
-    }
   },
   mounted() {
     var user = sessionStorage.getItem("user");
     if (user) {
-      user = JSON.parse(user);
-      this.sysUserId = user.id||"";
-      this.sysUserName = user.username || "";
-      this.sysNickName = user.nickName || "";
-      this.sysUserAvatar = path.API_PATH + user.avatarUrl || "";
+      this.loginUser = user;
+      this.loginUser = JSON.parse(user);
+
+      this.sysUserId = this.loginUser.id||"";
+      this.sysUserName = this.loginUser.username || "";
+      this.sysNickName = this.loginUser.nickName || "";
+      this.sysUserAvatar = path.API_PATH + this.loginUser.avatarUrl || "";
       console.log(this.sysUserAvatar);
     }
   }
@@ -429,6 +370,7 @@ export default {
       border-color: rgba(238, 241, 146, 0.3);
       border-right-width: 1px;
       border-right-style: solid;
+      width: 230px;
       img {
         width: 40px;
         float: left;
@@ -437,12 +379,6 @@ export default {
       .txt {
         color: #fff;
       }
-    }
-    .logo-width {
-      width: 230px;
-    }
-    .logo-collapse-width {
-      width: 60px;
     }
     .tools {
       padding: 0px 23px;
@@ -468,6 +404,10 @@ export default {
       .el-menu {
         height: 100%;
       }
+   //   .el-menu-item.is-active{
+      //  background-color: blue;
+      //  color:#fff;
+     // }
       .collapsed {
         width: 60px;
         .item {
@@ -482,10 +422,6 @@ export default {
           display: none;
         }
       }
-    }
-    .menu-collapsed {
-      flex: 0 0 60px;
-      width: 60px;
     }
     .menu-expanded {
       flex: 0 0 230px;

@@ -48,7 +48,7 @@
 				</el-col>
 			</el-row>
 			<el-row :gutter="20">
-				<el-col :span="5">
+				<el-col :span="8">
 					<el-form-item label="平均寿命">
 						<el-col :span="9">
 								<el-input v-model="queryForm.minLife"></el-input>
@@ -60,7 +60,7 @@
 						<el-col :span="1">年</el-col>
 					</el-form-item>
 				</el-col>
-				<el-col :span="5">
+				<el-col :span="8">
 					<el-form-item label="平均价格">
 						<el-col :span="9" :offset="2">
 								<el-input v-model="queryForm.minPrice"></el-input>

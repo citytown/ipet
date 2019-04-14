@@ -5,7 +5,7 @@
 		</el-row>
 		<div class="main-cons">
 			<el-row v-for="item in adviceList" :key="item.id">
-				<el-col :offset="1" :span="21">
+				<el-col  :span="23">
 					<div class="box">
 						<el-col :span="4" style="text-align:center">
 							<el-row>
@@ -15,16 +15,16 @@
 								<div class="name">昵称：{{item.nickName}}</div>
 							</el-row>
 						</el-col >
-						<el-col :span="19">
+						<el-col :span="20">
 							<el-row >
-								<el-col class="date-txt" :offset="20">{{item.signDate}}</el-col>
+								<el-col class="date-txt" :offset="18">{{item.signDate}}</el-col>
 							</el-row>
 							<el-row >
-								<div class="content-txt">{{item.content}}</div>
+								<el-col :offset="1" class="content-txt">{{item.content}}</el-col>
 							</el-row>
 							<el-row v-if="loginUser.roleId == 1">
-								<el-col :span='1' :offset="16" class='del-btn'><el-button type="danger" @click="delSubmit(item.id)">删除</el-button></el-col>
-								<el-col :span='6' :offset="1" ><div class="email-txt">邮箱：{{item.email}}</div></el-col>
+								<el-col :span='7' :offset="12" ><div class="email-txt">邮箱：{{item.email}}</div></el-col>
+								<el-col :span='1' :offset="2" class='del-btn'><el-button type="danger" @click="delSubmit(item.id)">删除</el-button></el-col>
 							</el-row>
 						</el-col>
 					</div>
@@ -133,6 +133,10 @@ import path from "@/common/constants/path.js"
 			},
 			//提交建议
 			adviceSubmit(){
+				if(this.loginUser.roleId ==1){
+					this.$message.error("管理员不能提交反馈建议！");
+					return;
+				}
 				this.adding = true;
 				this.$refs.adviceForm.validate(valid=>{
 					if(valid){
@@ -188,7 +192,7 @@ import path from "@/common/constants/path.js"
     	height: 250px;
     	border-radius: 4px;
     	margin-left: 30px;
-    	margin-top: 10px;
+    	margin-top: 15px;
     	box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
 	}
 	.avatar{
